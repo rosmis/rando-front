@@ -3,6 +3,15 @@ import SearchInput from "../molecules/SearchInput";
 import debounce from "lodash.debounce";
 import UiResult from "../atoms/UiResult";
 import { FaX } from "react-icons/fa6";
+import {styled} from "styled-components";
+
+const StyledSearchBar = styled.div`
+    position: absolute;
+    top: 3%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+`;
 
 const SearchBar = ({
     handleSelectedLocation: handleParentSelectedLocation,
@@ -51,7 +60,7 @@ const SearchBar = ({
     }, [debouncedResults]);
 
     return (
-        <div className="flex flex-col gap-2 items-start">
+        <StyledSearchBar className="flex flex-col gap-2 items-start">
             <SearchInput
                 handleInput={handleInputChange}
                 iconRight={searchTerm ? <FaX className="text-xs" /> : <></>}
@@ -75,12 +84,12 @@ const SearchBar = ({
                         );
                     })}
             </div>
-        </div>
+        </StyledSearchBar>
     );
 };
 
 async function getLocations(location: string) {
-    const accessToken = import.meta.env.VITE_MAPBOX_API_KEY;
+    const accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
     const response = await fetch(
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${location}.json?proximity=ip&language=fr&access_token=${accessToken}`

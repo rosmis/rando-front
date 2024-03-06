@@ -26,16 +26,6 @@ const Mapbox = ({ selectedLocation }) => {
             setZoom(map.current.getZoom().toFixed(2));
         });
 
-        // Add our navigation control (the +/- zoom buttons)
-        // map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
-
-        // Map onload event
-        // map.current.on("load", () => {
-        //     // Nifty code to force map to fit inside container when it loads
-        //     map.current.resize();
-        // });
-
-        // Clean up on unmount
         return () => map.current.remove();
     }, []);
 
@@ -44,8 +34,7 @@ const Mapbox = ({ selectedLocation }) => {
             console.log("selectedLocation", selectedLocation);
             map.current.flyTo({
                 center: [selectedLocation[0], selectedLocation[1]],
-                // center: [selectedLocation.lng, selectedLocation.lat],
-                essential: true, // this animation is considered essential with respect to prefers-reduced-motion
+                essential: true,
             });
         }
     }, [selectedLocation]);

@@ -4,7 +4,9 @@ import debounce from "lodash.debounce";
 import UiResult from "../atoms/UiResult";
 import { FaX } from "react-icons/fa6";
 
-const SearchBar = () => {
+const SearchBar = ({
+    handleSelectedLocation: handleParentSelectedLocation,
+}) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [locations, setLocations] = useState([]);
 
@@ -12,6 +14,13 @@ const SearchBar = () => {
         setSearchTerm(newSearchTerm);
 
         debouncedResults(newSearchTerm);
+    };
+
+    const handleSelectedLocation = (location) => {
+        setSearchTerm(location.name.concat(", ", location.location));
+
+        handleParentSelectedLocation(location);
+        setLocations([]);
     };
 
     const debouncedResults = useMemo(() => {
@@ -28,7 +37,7 @@ const SearchBar = () => {
                     return {
                         name: exactLocation,
                         location: locationName.join(", "),
-                        center: location.center,
+                        centerCoordinates: location.center,
                     };
                 })
             );
@@ -49,15 +58,19 @@ const SearchBar = () => {
                 searchTerm={searchTerm}
             />
 
-            <div className="flex flex-col max-h-[250px] overflow-y-scroll">
+            <div className="flex flex-col overflow-y-scroll">
                 {!!searchTerm &&
                     locations.map((location, i) => {
-                        const { name, location: locationDetails } = location;
                         return (
+                            // couldn't pass rounded prop boolean to styled-components, weird behavior
                             <UiResult
                                 key={i}
-                                mainResult={name}
-                                secondaryResult={locationDetails}
+                                location={location}
+                                roundedtop={i === 0 ? "top" : ""}
+                                roundedbottom={
+                                    i === locations.length - 1 ? "bottom" : ""
+                                }
+                                handleSelectedLocation={handleSelectedLocation}
                             />
                         );
                     })}
@@ -70,7 +83,7 @@ async function getLocations(location: string) {
     const accessToken = import.meta.env.VITE_MAPBOX_API_KEY;
 
     const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${location}.json?proximity=ip&access_token=${accessToken}`
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${location}.json?proximity=ip&language=fr&access_token=${accessToken}`
     );
     const data = await response.json();
 

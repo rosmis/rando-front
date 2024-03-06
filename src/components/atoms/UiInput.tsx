@@ -12,9 +12,15 @@ const UiInput = ({
     icon = <></>,
     placeholder = "Recherchez un lieu...",
     handleInput,
+    iconRight = <></>,
+    searchTerm = "",
 }) => {
     const handleInputChange = (e) => {
         handleInput(e.target.value);
+    };
+
+    const handleResetInput = () => {
+        handleInput("");
     };
 
     return (
@@ -26,7 +32,15 @@ const UiInput = ({
                     placeholder={placeholder}
                     className="outline-none w-full bg-transparent"
                     onChange={handleInputChange}
+                    value={searchTerm}
                 />
+
+                <span
+                    className="p-2 transition-all hover:bg-slate-200 cursor-pointer rounded-lg "
+                    onClick={handleResetInput}
+                >
+                    {iconRight}
+                </span>
             </StyledInput>
         </>
     );

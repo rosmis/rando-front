@@ -2,43 +2,52 @@ import { useEffect, useMemo, useState } from "react";
 import SearchInput from "../molecules/SearchInput";
 import debounce from "lodash.debounce";
 import UiResult from "../atoms/UiResult";
+import { FaX } from "react-icons/fa6";
 
 const SearchBar = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [locations, setLocations] = useState([]);
 
-    const handleInputChange = async (e: string) => {
-        setSearchTerm(e);
+    const handleInputChange = (newSearchTerm: string) => {
+        setSearchTerm(newSearchTerm);
 
-        const fetchedLocations = await getLocations(searchTerm);
-
-        setLocations(
-            fetchedLocations.features.map((location) => {
-                const [exactLocation, ...locationName] =
-                    location.place_name.split(", ");
-
-                return {
-                    name: exactLocation,
-                    location: locationName.join(", "),
-                    center: location.center,
-                };
-            })
-        );
+        debouncedResults(newSearchTerm);
     };
 
     const debouncedResults = useMemo(() => {
-        return debounce(handleInputChange, 300);
+        return debounce(async (newSearchTerm: string) => {
+            if (!newSearchTerm) return;
+
+            const fetchedLocations = await getLocations(newSearchTerm);
+
+            setLocations(
+                fetchedLocations.features.map((location) => {
+                    const [exactLocation, ...locationName] =
+                        location.place_name.split(", ");
+
+                    return {
+                        name: exactLocation,
+                        location: locationName.join(", "),
+                        center: location.center,
+                    };
+                })
+            );
+        }, 300);
     }, []);
 
     useEffect(() => {
         return () => {
             debouncedResults.cancel();
         };
-    });
+    }, [debouncedResults]);
 
     return (
         <div className="flex flex-col gap-2 items-start">
-            <SearchInput handleInput={handleInputChange} />
+            <SearchInput
+                handleInput={handleInputChange}
+                iconRight={searchTerm ? <FaX className="text-xs" /> : <></>}
+                searchTerm={searchTerm}
+            />
 
             <div className="flex flex-col max-h-[250px] overflow-y-scroll">
                 {!!searchTerm &&
@@ -64,6 +73,7 @@ async function getLocations(location: string) {
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${location}.json?proximity=ip&access_token=${accessToken}`
     );
     const data = await response.json();
+
     return data;
 }
 

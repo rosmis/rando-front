@@ -15,7 +15,7 @@ const zoomLevelsDict = {
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
-const Mapbox = ({ selectedLocation }) => {
+const Mapbox = ({ selectedLocation, hikes }) => {
     const mapContainerRef = useRef(null);
     const map = useRef(null);
 
@@ -51,8 +51,88 @@ const Mapbox = ({ selectedLocation }) => {
                 essential: true,
                 zoom: zoomLevelsDict[selectedLocation.placeType],
             });
+
+            // DEBUG PURPOSES
+            map.current.addSource("circle", {
+                type: "geojson",
+                data: {
+                    type: "Feature",
+                    geometry: {
+                        type: "Point",
+                        coordinates: [
+                            selectedLocation.coordinates[0],
+                            selectedLocation.coordinates[1],
+                        ],
+                    },
+                },
+            });
+            // DEBUG PURPOSES
+            map.current.addLayer({
+                id: "circle",
+                type: "circle",
+                source: "circle",
+                paint: {
+                    "circle-radius": {
+                        stops: [
+                            [0, 0],
+                            [
+                                20,
+                                metersToPixelsAtMaxZoom(
+                                    50000,
+                                    selectedLocation.coordinates[1]
+                                ),
+                            ],
+                        ],
+                        base: 2,
+                    },
+                    "circle-color": "#007cbf",
+                    "circle-opacity": 0.3,
+                },
+            });
         }
     }, [selectedLocation]);
+
+    useEffect(() => {
+        if (hikes.length && map.current) {
+            map.current.loadImage(
+                "https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png",
+                (error, image) => {
+                    if (error) throw error;
+                    map.current.addImage("custom-marker", image);
+
+                    map.current.addSource("points", {
+                        type: "geojson",
+                        data: {
+                            type: "FeatureCollection",
+                            features: [
+                                ...hikes.map((hike) => {
+                                    return {
+                                        type: "Feature",
+                                        geometry: {
+                                            type: "Point",
+                                            coordinates: [
+                                                hike.longitude,
+                                                hike.latitude,
+                                            ],
+                                        },
+                                    };
+                                }),
+                            ],
+                        },
+                    });
+
+                    map.current.addLayer({
+                        id: "points",
+                        type: "symbol",
+                        source: "points",
+                        layout: {
+                            "icon-image": "custom-marker",
+                        },
+                    });
+                }
+            );
+        }
+    }, [hikes]);
 
     return (
         <>
@@ -68,4 +148,6 @@ const Mapbox = ({ selectedLocation }) => {
     );
 };
 
+const metersToPixelsAtMaxZoom = (meters, latitude) =>
+    meters / 0.075 / Math.cos((latitude * Math.PI) / 180);
 export default Mapbox;

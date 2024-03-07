@@ -1,6 +1,18 @@
 import mapboxgl from "mapbox-gl";
 import { useEffect, useRef, useState } from "react";
 
+const zoomLevelsDict = {
+    country: 5,
+    region: 7,
+    postcode: 9,
+    district: 11,
+    place: 13,
+    locality: 15,
+    neighborhood: 16,
+    address: 17,
+    poi: 17,
+};
+
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
 const Mapbox = ({ selectedLocation }) => {
@@ -31,10 +43,13 @@ const Mapbox = ({ selectedLocation }) => {
 
     useEffect(() => {
         if (selectedLocation && map.current) {
-            console.log("selectedLocation", selectedLocation);
             map.current.flyTo({
-                center: [selectedLocation[0], selectedLocation[1]],
+                center: [
+                    selectedLocation.coordinates[0],
+                    selectedLocation.coordinates[1],
+                ],
                 essential: true,
+                zoom: zoomLevelsDict[selectedLocation.placeType],
             });
         }
     }, [selectedLocation]);

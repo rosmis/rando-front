@@ -3,7 +3,7 @@ import SearchInput from "../molecules/SearchInput";
 import debounce from "lodash.debounce";
 import UiResult from "../atoms/UiResult";
 import { FaX } from "react-icons/fa6";
-import {styled} from "styled-components";
+import { styled } from "styled-components";
 
 const StyledSearchBar = styled.div`
     position: absolute;
@@ -47,6 +47,7 @@ const SearchBar = ({
                         name: exactLocation,
                         location: locationName.join(", "),
                         centerCoordinates: location.center,
+                        placeType: location.place_type[0],
                     };
                 })
             );

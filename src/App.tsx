@@ -5,8 +5,12 @@ import Mapbox from "./components/organisms/Mapbox";
 function App() {
     const [selectedLocation, setSelectedLocation] = useState(null);
 
-    const handleSelectedLocation = (location) =>
-        setSelectedLocation(location.centerCoordinates);
+    const handleSelectedLocation = (location) => {
+        setSelectedLocation({
+            coordinates: location.centerCoordinates,
+            placeType: location.placeType,
+        });
+    };
 
     return (
         <>

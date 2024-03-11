@@ -1,5 +1,7 @@
 import mapboxgl from "mapbox-gl";
 import { useEffect, useRef, useState } from "react";
+import { RootState } from "../../state/store";
+import { useSelector } from "react-redux";
 
 const zoomLevelsDict = {
     country: 5,
@@ -15,13 +17,17 @@ const zoomLevelsDict = {
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
-const Mapbox = ({ selectedLocation, hikes }) => {
+const Mapbox = ({ hikes }) => {
     const mapContainerRef = useRef(null);
     const map = useRef(null);
 
     const [lng, setLng] = useState(3.074001);
     const [lat, setLat] = useState(46.959325);
     const [zoom, setZoom] = useState(5);
+
+    const selectedLocation = useSelector(
+        (state: RootState) => state.location.selectedLocation
+    );
 
     // Initialize map when component mounts
     useEffect(() => {

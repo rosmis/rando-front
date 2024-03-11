@@ -18,6 +18,20 @@ function App() {
     //     (state: RootState) => state.location.locations
     // );
 
+    // useEffect(() => {
+    //     if (selectedLocation) {
+    //         const getLocations = async (location) => {
+    //             const hikes = await fetch(
+    //                 `http://localhost:80/api/hikes/search?latitude=${location?.coordinates[1]}&longitude=${location?.coordinates[0]}&radius=50`
+    //             ).then((response) => response.json());
+
+    //             setHikes(hikes.data);
+    //         };
+
+    //         getLocations(selectedLocation);
+    //     }
+    // }, [selectedLocation]);
+
     return (
         <>
             <div className="absolute top-5 right-0 flex bg-red-600 z-50">

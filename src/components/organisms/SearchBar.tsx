@@ -4,6 +4,9 @@ import debounce from "lodash.debounce";
 import UiResult from "../atoms/UiResult";
 import { FaX } from "react-icons/fa6";
 import { styled } from "styled-components";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../state/store";
+import { setSearchedLocation } from "../../state/location/locationSlice";
 
 const StyledSearchBar = styled.div`
     position: absolute;
@@ -16,17 +19,20 @@ const StyledSearchBar = styled.div`
 const SearchBar = ({
     handleSelectedLocation: handleParentSelectedLocation,
 }) => {
-    const [searchTerm, setSearchTerm] = useState("");
+    // const [searchTerm, setSearchTerm] = useState("");
     const [locations, setLocations] = useState([]);
 
+    const searchedLocation = useSelector((state: RootState) => state.location.searchedLocation);
+    const dispatch = useDispatch();
+
     const handleInputChange = (newSearchTerm: string) => {
-        setSearchTerm(newSearchTerm);
+        dispatch(setSearchedLocation(newSearchTerm))
 
         debouncedResults(newSearchTerm);
     };
 
     const handleSelectedLocation = (location) => {
-        setSearchTerm(location.name.concat(", ", location.location));
+        dispatch(setSearchedLocation(location.name.concat(", ", location.location)))
 
         handleParentSelectedLocation(location);
         setLocations([]);
@@ -64,12 +70,12 @@ const SearchBar = ({
         <StyledSearchBar className="flex flex-col gap-2 items-start">
             <SearchInput
                 handleInput={handleInputChange}
-                iconRight={searchTerm ? <FaX className="text-xs" /> : <></>}
-                searchTerm={searchTerm}
+                iconRight={searchedLocation ? <FaX className="text-xs" /> : <></>}
+                searchTerm={searchedLocation}
             />
 
             <div className="flex flex-col overflow-y-scroll">
-                {!!searchTerm &&
+                {!!searchedLocation &&
                     locations.map((location, i) => {
                         return (
                             // couldn't pass rounded prop boolean to styled-components, weird behavior

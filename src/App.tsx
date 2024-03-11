@@ -17,7 +17,7 @@ function App() {
         if (selectedLocation) {
             const getLocations = async (location) => {
                 const hikes = await fetch(
-                    `http://localhost:80/api/hikes?latitude=${location?.coordinates[1]}&longitude=${location?.coordinates[0]}&radius=50`
+                    `http://localhost:80/api/hikes/search?latitude=${location?.coordinates[1]}&longitude=${location?.coordinates[0]}&radius=50`
                 ).then((response) => response.json());
 
                 setHikes(hikes.data);

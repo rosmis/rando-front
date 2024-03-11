@@ -1,7 +1,5 @@
-import React, { useRef, useEffect, useState } from 'react'
+import { useState } from "react";
 import SearchBar from "./components/organisms/SearchBar";
-import Mapbox from "./components/organisms/Mapbox";
-
 
 function App() {
     const [selectedLocation, setSelectedLocation] = useState([]);
@@ -17,7 +15,6 @@ function App() {
                 Selected coordinates: {selectedLocation}
             </pre>
             <SearchBar handleSelectedLocation={handleSelectedLocation} />
-            <Mapbox></Mapbox>
         </>
     );
 }

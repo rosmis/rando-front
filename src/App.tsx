@@ -1,20 +1,36 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchBar from "./components/organisms/SearchBar";
+import Mapbox from "./components/organisms/Mapbox";
 
 function App() {
-    const [selectedLocation, setSelectedLocation] = useState([]);
+    const [selectedLocation, setSelectedLocation] = useState(null);
+    const [hikes, setHikes] = useState([]);
 
-    const handleSelectedLocation = (location) => {
-        setSelectedLocation(location.centerCoordinates);
+    const handleSelectedLocation = async (location) => {
+        setSelectedLocation({
+            coordinates: location.centerCoordinates,
+            placeType: location.placeType,
+        });
     };
+
+    useEffect(() => {
+        if (selectedLocation) {
+            const getLocations = async (location) => {
+                const hikes = await fetch(
+                    `http://localhost:80/api/hikes/search?latitude=${location?.coordinates[1]}&longitude=${location?.coordinates[0]}&radius=50`
+                ).then((response) => response.json());
+
+                setHikes(hikes.data);
+            };
+
+            getLocations(selectedLocation);
+        }
+    }, [selectedLocation]);
 
     return (
         <>
-            <h1>Search for a location</h1>
-            <pre className="text-white">
-                Selected coordinates: {selectedLocation}
-            </pre>
             <SearchBar handleSelectedLocation={handleSelectedLocation} />
+            <Mapbox selectedLocation={selectedLocation} hikes={hikes} />
         </>
     );
 }

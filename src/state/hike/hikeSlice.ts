@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Hike, HikePreview } from "../../types/hikes";
 import { Location } from "../location/locationSlice";
 
@@ -16,10 +16,10 @@ const hikeSlice = createSlice({
     name: "hike",
     initialState,
     reducers: {
-        setHikesPreview: (state, action) => {
+        setHikesPreview: (state, action: PayloadAction<HikePreview[]>) => {
             state.hikesPreview = action.payload;
         },
-        setSelectedHike: (state, action) => {
+        setSelectedHike: (state, action: PayloadAction<Hike>) => {
             state.selectedHike = action.payload;
         },
     },

@@ -1,6 +1,6 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-interface Location {
+export interface Location {
     coordinates: number[];
     placeType: string;
 }

@@ -1,7 +1,8 @@
 import mapboxgl from "mapbox-gl";
 import { useEffect, useRef, useState } from "react";
-import { RootState } from "../../state/store";
-import { useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../state/store";
+import { useDispatch, useSelector } from "react-redux";
+import { hikePreviewAsync } from "../../state/hike/hikeSlice";
 
 const zoomLevelsDict = {
     country: 5,
@@ -17,9 +18,10 @@ const zoomLevelsDict = {
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
-const Mapbox = ({ hikes }) => {
+const Mapbox = () => {
     const mapContainerRef = useRef(null);
     const map = useRef(null);
+    const dispatch = useDispatch<AppDispatch>();
 
     const [lng, setLng] = useState(3.074001);
     const [lat, setLat] = useState(46.959325);
@@ -27,6 +29,9 @@ const Mapbox = ({ hikes }) => {
 
     const selectedLocation = useSelector(
         (state: RootState) => state.location.selectedLocation
+    );
+    const hikesPreview = useSelector(
+        (state: RootState) => state.hike.hikesPreview
     );
 
     // Initialize map when component mounts
@@ -49,6 +54,8 @@ const Mapbox = ({ hikes }) => {
 
     useEffect(() => {
         if (selectedLocation && map.current) {
+            dispatch(hikePreviewAsync(selectedLocation));
+
             map.current.flyTo({
                 center: [
                     selectedLocation.coordinates[0],
@@ -57,49 +64,11 @@ const Mapbox = ({ hikes }) => {
                 essential: true,
                 zoom: zoomLevelsDict[selectedLocation.placeType],
             });
-
-            // DEBUG PURPOSES
-            map.current.addSource("circle", {
-                type: "geojson",
-                data: {
-                    type: "Feature",
-                    geometry: {
-                        type: "Point",
-                        coordinates: [
-                            selectedLocation.coordinates[0],
-                            selectedLocation.coordinates[1],
-                        ],
-                    },
-                },
-            });
-            // DEBUG PURPOSES
-            map.current.addLayer({
-                id: "circle",
-                type: "circle",
-                source: "circle",
-                paint: {
-                    "circle-radius": {
-                        stops: [
-                            [0, 0],
-                            [
-                                20,
-                                metersToPixelsAtMaxZoom(
-                                    50000,
-                                    selectedLocation.coordinates[1]
-                                ),
-                            ],
-                        ],
-                        base: 2,
-                    },
-                    "circle-color": "#007cbf",
-                    "circle-opacity": 0.3,
-                },
-            });
         }
-    }, [selectedLocation]);
+    }, [dispatch, selectedLocation]);
 
     useEffect(() => {
-        if (hikes.length && map.current) {
+        if (hikesPreview.length && map.current) {
             map.current.loadImage(
                 "https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png",
                 (error, image) => {
@@ -111,7 +80,7 @@ const Mapbox = ({ hikes }) => {
                         data: {
                             type: "FeatureCollection",
                             features: [
-                                ...hikes.map((hike) => {
+                                ...hikesPreview.map((hike) => {
                                     return {
                                         type: "Feature",
                                         geometry: {
@@ -138,7 +107,7 @@ const Mapbox = ({ hikes }) => {
                 }
             );
         }
-    }, [hikes]);
+    }, [hikesPreview]);
 
     return (
         <>
@@ -147,13 +116,11 @@ const Mapbox = ({ hikes }) => {
             </div>
 
             <div
-                className="map-container h-screen w-screen"
                 ref={mapContainerRef}
+                className="map-container h-screen w-screen"
             />
         </>
     );
 };
 
-const metersToPixelsAtMaxZoom = (meters, latitude) =>
-    meters / 0.075 / Math.cos((latitude * Math.PI) / 180);
 export default Mapbox;

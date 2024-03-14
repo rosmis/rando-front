@@ -17,10 +17,6 @@ function App() {
 
     return (
         <>
-            <div className="absolute top-5 right-0 flex bg-red-600 z-50">
-                <pre>{JSON.stringify(selectedLocation, null, 2)}</pre>
-                {/* <pre>{JSON.stringify(locations, null, 2)}</pre> */}
-            </div>
             <SearchBar />
             <Mapbox />
         </>

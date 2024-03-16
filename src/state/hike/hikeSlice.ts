@@ -1,15 +1,19 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Hike, HikePreview } from "../../types/hikes";
 import { Location } from "../location/locationSlice";
+import { FeatureCollection } from "geojson";
+import { gpx } from "@tmcw/togeojson";
 
 interface HikeState {
     hikesPreview: HikePreview[];
     selectedHike?: Hike;
+    selectedGeoJsonHike?: FeatureCollection;
 }
 
 const initialState: HikeState = {
     hikesPreview: [],
     selectedHike: undefined,
+    selectedGeoJsonHike: undefined,
 };
 
 const hikeSlice = createSlice({
@@ -24,12 +28,24 @@ const hikeSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        builder.addCase(hikePreviewAsync.fulfilled, (state, action) => {
-            state.hikesPreview = action.payload;
-        });
-        builder.addCase(hikeAsync.fulfilled, (state, action) => {
-            state.selectedHike = action.payload;
-        });
+        builder.addCase(
+            hikePreviewAsync.fulfilled,
+            (state, action: PayloadAction<HikePreview[]>) => {
+                state.hikesPreview = action.payload;
+            }
+        );
+        builder.addCase(
+            hikeAsync.fulfilled,
+            (state, action: PayloadAction<Hike>) => {
+                state.selectedHike = action.payload;
+            }
+        );
+        builder.addCase(
+            gpxAsync.fulfilled,
+            (state, action: PayloadAction<FeatureCollection>) => {
+                state.selectedGeoJsonHike = action.payload;
+            }
+        );
     },
 });
 
@@ -52,6 +68,19 @@ export const hikeAsync = createAsyncThunk(
         );
 
         return hike.data;
+    }
+);
+
+export const gpxAsync = createAsyncThunk(
+    "hike/fetchGpx",
+    async (url: string) => {
+        const geoJson: FeatureCollection = await fetch(url)
+            .then((response) => response.text())
+            .then((data) => {
+                return gpx(new DOMParser().parseFromString(data, "text/xml"));
+            });
+
+        return geoJson;
     }
 );
 

@@ -35,10 +35,16 @@ const Mapbox = () => {
             dispatch(hikePreviewAsync(selectedLocation));
 
             if (selectedLocation.bbox) {
+                // TODO add dinamic radius after sidebar creation with radius
+                const boundingBox = calculateBbox(
+                    selectedLocation.coordinates,
+                    50
+                );
+
                 mapRef.current.fitBounds(
                     [
-                        [selectedLocation.bbox[0], selectedLocation.bbox[1]],
-                        [selectedLocation.bbox[2], selectedLocation.bbox[3]],
+                        [boundingBox[0], boundingBox[1]],
+                        [boundingBox[2], boundingBox[3]],
                     ],
                     {
                         padding: { top: 10, bottom: 25, left: 15, right: 5 },
@@ -140,5 +146,26 @@ const Mapbox = () => {
         </>
     );
 };
+
+function calculateBbox(center: number[], radiusInKm: number) {
+    const [lng, lat] = center;
+
+    // Radius of the Earth in km
+    const R = 6371;
+
+    // Angular distance in radians on a great circle
+    const radDist = radiusInKm / R;
+
+    const minLat = lat - radDist * (180 / Math.PI);
+    const maxLat = lat + radDist * (180 / Math.PI);
+
+    const deltaLng = Math.asin(
+        Math.sin(radDist) / Math.cos((lat * Math.PI) / 180)
+    );
+    const minLng = lng - deltaLng * (180 / Math.PI);
+    const maxLng = lng + deltaLng * (180 / Math.PI);
+
+    return [minLng, minLat, maxLng, maxLat];
+}
 
 export default Mapbox;

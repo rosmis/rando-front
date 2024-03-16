@@ -10,7 +10,6 @@ import { setSelectedLocation } from "../../state/location/locationSlice";
 import { ZoomLevels } from "../../types/zoomLevels";
 
 const Mapbox = () => {
-    // const mapContainerRef = useRef(null);
     const mapRef = useRef<MapRef>(null);
     const mapboxAccessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 

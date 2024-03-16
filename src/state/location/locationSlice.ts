@@ -1,9 +1,10 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { ZoomLevels } from "../../types/zoomLevels";
 
 export interface Location {
     coordinates: number[];
     bbox?: number[];
-    placeType: string;
+    placeType: keyof typeof ZoomLevels;
 }
 
 interface ResultLocation {
@@ -37,7 +38,7 @@ const locationSlice = createSlice({
         },
         setLocations: (state, action: PayloadAction<ResultLocation[]>) => {
             state.locations = action.payload;
-        }
+        },
     },
     extraReducers: (builder) => {
         builder.addCase(locationsAsync.fulfilled, (state, action) => {

@@ -2,23 +2,12 @@ import { useMemo } from "react";
 import { useEffect, useRef, useState } from "react";
 import { AppDispatch, RootState } from "../../state/store";
 import { useDispatch, useSelector } from "react-redux";
-import { hikePreviewAsync } from "../../state/hike/hikeSlice";
+import { hikeAsync, hikePreviewAsync } from "../../state/hike/hikeSlice";
 import Map, { MapRef, Marker } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { FaLocationDot } from "react-icons/fa6";
 import { setSelectedLocation } from "../../state/location/locationSlice";
-
-const zoomLevelsDict = {
-    country: 5,
-    region: 7,
-    postcode: 9,
-    district: 11,
-    place: 13,
-    locality: 15,
-    neighborhood: 16,
-    address: 17,
-    poi: 17,
-};
+import { ZoomLevels } from "../../types/zoomLevels";
 
 const Mapbox = () => {
     // const mapContainerRef = useRef(null);
@@ -36,6 +25,10 @@ const Mapbox = () => {
     );
     const hikesPreview = useSelector(
         (state: RootState) => state.hike.hikesPreview
+    );
+
+    const selectedHike = useSelector(
+        (state: RootState) => state.hike.selectedHike
     );
 
     useEffect(() => {
@@ -58,7 +51,7 @@ const Mapbox = () => {
                         selectedLocation.coordinates[0],
                         selectedLocation.coordinates[1],
                     ],
-                    zoom: zoomLevelsDict[selectedLocation.placeType],
+                    zoom: ZoomLevels[selectedLocation.placeType],
                     essential: true,
                 });
             }
@@ -82,9 +75,10 @@ const Mapbox = () => {
                                         hike.latitude,
                                     ],
                                     bbox: undefined,
-                                    placeType: "poi",
+                                    placeType: "POI",
                                 })
                             );
+                            dispatch(hikeAsync(hike.id));
                         }}
                     >
                         <FaLocationDot size={30} color="#ad4343" />
@@ -114,9 +108,9 @@ const Mapbox = () => {
 
     return (
         <>
-            <div className="absolute top-20 left-0 bg-red-600 z-50">
-                {JSON.stringify(selectedLocation)}
-            </div>
+            {/* <div className="absolute top-20 left-0 bg-red-600 z-50">
+                {JSON.stringify(selectedHike)}
+            </div> */}
 
             <Map
                 initialViewState={{

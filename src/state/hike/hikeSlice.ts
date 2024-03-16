@@ -27,6 +27,9 @@ const hikeSlice = createSlice({
         builder.addCase(hikePreviewAsync.fulfilled, (state, action) => {
             state.hikesPreview = action.payload;
         });
+        builder.addCase(hikeAsync.fulfilled, (state, action) => {
+            state.selectedHike = action.payload;
+        });
     },
 });
 
@@ -38,6 +41,17 @@ export const hikePreviewAsync = createAsyncThunk(
         ).then((response) => response.json());
 
         return hikes.data;
+    }
+);
+
+export const hikeAsync = createAsyncThunk(
+    "hike/fetchHike",
+    async (id: number) => {
+        const hike = await fetch(`http://localhost:80/api/hikes/${id}`).then(
+            (response) => response.json()
+        );
+
+        return hike.data;
     }
 );
 

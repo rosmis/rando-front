@@ -23,8 +23,9 @@ const zoomLevelsDict = {
 const Mapbox = () => {
     // const mapContainerRef = useRef(null);
     const mapRef = useRef<MapRef>(null);
-    const dispatch = useDispatch<AppDispatch>();
     const mapboxAccessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+
+    const dispatch = useDispatch<AppDispatch>();
 
     const [lng, setLng] = useState(3.074001);
     const [lat, setLat] = useState(46.959325);
@@ -41,14 +42,26 @@ const Mapbox = () => {
         if (selectedLocation && mapRef.current) {
             dispatch(hikePreviewAsync(selectedLocation));
 
-            mapRef.current.flyTo({
-                center: [
-                    selectedLocation.coordinates[0],
-                    selectedLocation.coordinates[1],
-                ],
-                zoom: zoomLevelsDict[selectedLocation.placeType],
-                essential: true,
-            });
+            if (selectedLocation.bbox) {
+                mapRef.current.fitBounds(
+                    [
+                        [selectedLocation.bbox[0], selectedLocation.bbox[1]],
+                        [selectedLocation.bbox[2], selectedLocation.bbox[3]],
+                    ],
+                    {
+                        padding: { top: 10, bottom: 25, left: 15, right: 5 },
+                    }
+                );
+            } else {
+                mapRef.current.flyTo({
+                    center: [
+                        selectedLocation.coordinates[0],
+                        selectedLocation.coordinates[1],
+                    ],
+                    zoom: zoomLevelsDict[selectedLocation.placeType],
+                    essential: true,
+                });
+            }
         }
     }, [dispatch, selectedLocation]);
 
@@ -68,6 +81,7 @@ const Mapbox = () => {
                                         hike.longitude,
                                         hike.latitude,
                                     ],
+                                    bbox: undefined,
                                     placeType: "poi",
                                 })
                             );
@@ -78,7 +92,7 @@ const Mapbox = () => {
                 );
             }),
 
-        [hikesPreview]
+        [dispatch, hikesPreview]
     );
 
     // const markers = useMemo(() => {

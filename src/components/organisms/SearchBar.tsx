@@ -44,6 +44,7 @@ const SearchBar = () => {
         dispatch(
             setSelectedLocation({
                 coordinates: location.centerCoordinates,
+                bbox: location.bbox,
                 placeType: location.placeType,
             })
         );

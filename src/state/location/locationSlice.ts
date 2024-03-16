@@ -2,6 +2,7 @@ import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 export interface Location {
     coordinates: number[];
+    bbox?: number[];
     placeType: string;
 }
 
@@ -48,6 +49,7 @@ const locationSlice = createSlice({
                     name: exactLocation,
                     location: locationName.join(", "),
                     centerCoordinates: location.center,
+                    bbox: location.bbox,
                     placeType: location.place_type[0],
                 };
             });

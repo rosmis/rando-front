@@ -13,9 +13,7 @@ const Mapbox = () => {
 
     const dispatch = useDispatch<AppDispatch>();
 
-    const [lng, setLng] = useState(3.074001);
-    const [lat, setLat] = useState(46.959325);
-    const [zoom, setZoom] = useState(5);
+    const viewState = useSelector((state: RootState) => state.mapbox.viewState);
 
     const selectedLocation = useSelector(
         (state: RootState) => state.location.selectedLocation
@@ -27,6 +25,24 @@ const Mapbox = () => {
     const selectedGeoJsonHike = useSelector(
         (state: RootState) => state.hike.selectedGeoJsonHike
     );
+
+    // let bearing = 0;
+
+    // // camera animation
+    // const rotateCamera = () => {
+    //     if (mapRef.current) {
+    //         mapRef.current.flyTo({
+    //             center: coordinate,
+    //             bearing: bearing,
+    //             speed: 0.1,
+    //             curve: 1,
+    //         });
+
+    //         bearing = (bearing + 10) % 360;
+
+    //         setTimeout(rotateCamera, 100);
+    //     }
+    // };
 
     useEffect(() => {
         if (selectedLocation && mapRef.current) {
@@ -70,11 +86,7 @@ const Mapbox = () => {
             </div> */}
 
             <Map
-                initialViewState={{
-                    longitude: lng,
-                    latitude: lat,
-                    zoom: zoom,
-                }}
+                initialViewState={viewState}
                 mapStyle="mapbox://styles/mapbox/streets-v9"
                 // mapStyle="mapbox://styles/rosmis/cltem9q7l002y01qwa3qk23tn"
                 mapboxAccessToken={mapboxAccessToken}

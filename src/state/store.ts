@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import locationReducer from "./location/locationSlice";
 import hikeReducer from "./hike/hikeSlice";
+import mapboxReducer from "./mapbox/mapboxSlice";
 
 export const store = configureStore({
     reducer: {
         location: locationReducer,
         hike: hikeReducer,
+        mapbox: mapboxReducer,
     },
 });
 

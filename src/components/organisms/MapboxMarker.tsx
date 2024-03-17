@@ -83,7 +83,7 @@ const MapboxMarker = ({ hike }: { hike: HikePreview }) => {
                         ? 1
                         : selectedHike.id === hike.id
                         ? 1
-                        : 0.5,
+                        : 0.3,
                 }}
             >
                 <FaLocationDot size={30} color="#ad4343" />

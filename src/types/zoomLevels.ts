@@ -8,4 +8,5 @@ export enum ZoomLevels {
     LOCALITY = 15,
     NEIGHBORHOOD = 16,
     ADDRESS = 17,
+    HIKE = 18,
 }

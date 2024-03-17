@@ -63,9 +63,9 @@ const MapboxMarker = ({ hike }: { hike: HikePreview }) => {
 
             dispatch(
                 setSelectedLocation({
-                    coordinates: undefined,
+                    coordinates: [lngSum / count, latSum / count],
                     bbox: selectedHikeBoundingBox,
-                    placeType: "POI",
+                    placeType: "HIKE",
                 })
             );
         }

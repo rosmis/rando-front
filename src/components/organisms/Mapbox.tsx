@@ -1,11 +1,18 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useEffect, useRef, useState } from "react";
 import { AppDispatch, RootState } from "../../state/store";
 import { useDispatch, useSelector } from "react-redux";
 import { hikePreviewAsync } from "../../state/hike/hikeSlice";
-import Map, { Layer, MapRef, Source } from "react-map-gl";
+import Map, {
+    Layer,
+    MapLayerMouseEvent,
+    MapRef,
+    Source,
+    ViewStateChangeEvent,
+} from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import MapboxMarker from "./MapboxMarker";
+import { setViewState } from "../../state/mapbox/mapboxSlice";
 
 const Mapbox = () => {
     const mapRef = useRef<MapRef>(null);
@@ -27,20 +34,22 @@ const Mapbox = () => {
     );
 
     // let bearing = 0;
+    // let timeoutId: NodeJS.Timeout;
 
     // // camera animation
     // const rotateCamera = () => {
-    //     if (mapRef.current) {
+    //     if (mapRef.current && selectedLocation) {
     //         mapRef.current.flyTo({
-    //             center: coordinate,
+    //             center: selectedLocation.coordinates,
     //             bearing: bearing,
     //             speed: 0.1,
+    //             pitch: 65,
     //             curve: 1,
     //         });
 
-    //         bearing = (bearing + 10) % 360;
+    //         bearing = (bearing + 1) % 360;
 
-    //         setTimeout(rotateCamera, 100);
+    //         timeoutId = setTimeout(rotateCamera, 100);
     //     }
     // };
 
@@ -48,7 +57,7 @@ const Mapbox = () => {
         if (selectedLocation && mapRef.current) {
             let selectedBoundingBox = selectedLocation.bbox;
 
-            if (selectedLocation.coordinates) {
+            if (selectedLocation.placeType !== "HIKE") {
                 dispatch(hikePreviewAsync(selectedLocation));
 
                 // TODO add dynamic radius after sidebar creation with radius
@@ -68,7 +77,21 @@ const Mapbox = () => {
                     padding: { top: 10, bottom: 25, left: 15, right: 5 },
                 }
             );
+
+            // TODO find a way to implement this gadget feature properly
+            // rotate camera only when hike selected and not when location selected
+            // mapRef.current.once("moveend", () => {
+            //     console.log("MOVE END");
+
+            //     if (selectedLocation.placeType === "HIKE") {
+            //         rotateCamera();
+            //     }
+            // });
         }
+
+        // return () => {
+        //     clearTimeout(timeoutId);
+        // };
     }, [dispatch, selectedLocation]);
 
     const markers = useMemo(() => {
@@ -79,18 +102,35 @@ const Mapbox = () => {
         });
     }, [hikesPreview]);
 
+    const onMove = useCallback((event: ViewStateChangeEvent) => {
+        dispatch(setViewState(event.viewState));
+    }, []);
+
+    // const onClick = useCallback(() => {
+    //     console.log("click", selectedLocation, timeoutId);
+    //     if (
+    //         selectedLocation &&
+    //         selectedLocation.placeType === "HIKE" &&
+    //         timeoutId
+    //     ) {
+    //         console.log("clearing timeout");
+    //         clearTimeout(timeoutId);
+    //     }
+    // }, [selectedLocation]);
+
     return (
         <>
             {/* <div className="absolute top-20 left-0 bg-red-600 z-50">
-                {JSON.stringify(selectedHike)}
+                {JSON.stringify(viewState)}
             </div> */}
 
             <Map
                 initialViewState={viewState}
-                mapStyle="mapbox://styles/mapbox/streets-v9"
-                // mapStyle="mapbox://styles/rosmis/cltem9q7l002y01qwa3qk23tn"
+                // mapStyle="mapbox://styles/mapbox/streets-v9"
+                mapStyle="mapbox://styles/rosmis/cltem9q7l002y01qwa3qk23tn"
                 mapboxAccessToken={mapboxAccessToken}
                 style={{ width: "100vw", height: "100vh" }}
+                onMove={onMove}
                 ref={mapRef}
             >
                 {selectedGeoJsonHike && (

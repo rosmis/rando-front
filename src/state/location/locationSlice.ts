@@ -2,7 +2,7 @@ import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ZoomLevels } from "../../types/zoomLevels";
 
 export interface Location {
-    coordinates?: number[];
+    coordinates: number[];
     bbox: number[];
     placeType: keyof typeof ZoomLevels;
 }

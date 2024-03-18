@@ -79,14 +79,19 @@ const MapboxMarker = ({ hike }: { hike: HikePreview }) => {
                 onClick={handleHikeSelection}
                 style={{
                     cursor: "pointer",
-                    opacity: !selectedHike
-                        ? 1
-                        : selectedHike.id === hike.id
-                        ? 1
-                        : 0.3,
                 }}
             >
-                <FaLocationDot size={30} color="#ad4343" />
+                <FaLocationDot
+                    size={30}
+                    color="#ad4343"
+                    style={{
+                        opacity: !selectedHike
+                            ? 1
+                            : selectedHike.id === hike.id
+                            ? 1
+                            : 0.5,
+                    }}
+                />
             </Marker>
         </>
     );

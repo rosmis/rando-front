@@ -4,8 +4,14 @@ import debounce from "lodash.debounce";
 import UiResult from "../atoms/UiResult";
 import { FaX } from "react-icons/fa6";
 import { styled } from "styled-components";
-import Sidebar from "../molecules/Sidebar";
-import { Button } from "../ui/button";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../state/store";
+import {
+    locationsAsync,
+    setLocations,
+    setSearchedLocation,
+    setSelectedLocation,
+} from "../../state/location/locationSlice";
 
 const StyledSearchBar = styled.div`
     position: absolute;
@@ -15,66 +21,59 @@ const StyledSearchBar = styled.div`
     z-index: 100;
 `;
 
-const SearchBar = ({
-    handleSelectedLocation: handleParentSelectedLocation,
-}) => {
-    const [searchTerm, setSearchTerm] = useState("");
-    const [locations, setLocations] = useState([]);
+const SearchBar = () => {
+    const dispatch = useDispatch<AppDispatch>();
+
+    const searchedLocation = useSelector(
+        (state: RootState) => state.location.searchedLocation
+    );
+    const locations = useSelector(
+        (state: RootState) => state.location.locations
+    );
 
     const handleInputChange = (newSearchTerm: string) => {
-        setSearchTerm(newSearchTerm);
+        dispatch(setSearchedLocation(newSearchTerm));
 
-        debouncedResults(newSearchTerm);
+        debounceSearch(newSearchTerm);
     };
 
-    const handleSelectedLocation = (location) => {
-        setSearchTerm(location.name.concat(", ", location.location));
+    const handleLocationSelection = (location) => {
+        dispatch(
+            setSearchedLocation(location.name.concat(", ", location.location))
+        );
+        dispatch(
+            setSelectedLocation({
+                coordinates: location.centerCoordinates,
+                bbox: location.bbox,
+                placeType: location.placeType,
+            })
+        );
 
-        handleParentSelectedLocation(location);
-        setLocations([]);
+        dispatch(setLocations([]));
     };
 
-    const debouncedResults = useMemo(() => {
+    const debounceSearch = useMemo(() => {
         return debounce(async (newSearchTerm: string) => {
             if (!newSearchTerm) return;
 
-            const fetchedLocations = await getLocations(newSearchTerm);
-
-            setLocations(
-                fetchedLocations.features.map((location) => {
-                    const [exactLocation, ...locationName] =
-                        location.place_name.split(", ");
-
-                    return {
-                        name: exactLocation,
-                        location: locationName.join(", "),
-                        centerCoordinates: location.center,
-                        placeType: location.place_type[0],
-                    };
-                })
-            );
+            dispatch(locationsAsync(newSearchTerm));
         }, 300);
     }, []);
 
-    useEffect(() => {
-        return () => {
-            debouncedResults.cancel();
-        };
-    }, [debouncedResults]);
+    useEffect(() => debounceSearch.cancel(), [debounceSearch]);
 
     return (
-
-        <>
-       
         <StyledSearchBar className="flex flex-col gap-2 items-start">
             <SearchInput
                 handleInput={handleInputChange}
-                iconRight={searchTerm ? <FaX className="text-xs" /> : <></>}
-                searchTerm={searchTerm}
+                iconRight={
+                    searchedLocation ? <FaX className="text-xs" /> : <></>
+                }
+                searchTerm={searchedLocation}
             />
 
             <div className="flex flex-col overflow-y-scroll">
-                {!!searchTerm &&
+                {!!searchedLocation &&
                     locations.map((location, i) => {
                         return (
                             // couldn't pass rounded prop boolean to styled-components, weird behavior
@@ -85,27 +84,13 @@ const SearchBar = ({
                                 roundedbottom={
                                     i === locations.length - 1 ? "bottom" : ""
                                 }
-                                handleSelectedLocation={handleSelectedLocation}
+                                handleSelectedLocation={handleLocationSelection}
                             />
                         );
                     })}
             </div>
         </StyledSearchBar>
-
-        
-        </>
     );
 };
-
-async function getLocations(location: string) {
-    const accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
-
-    const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${location}.json?proximity=ip&language=fr&access_token=${accessToken}`
-    );
-    const data = await response.json();
-
-    return data;
-}
 
 export default SearchBar;

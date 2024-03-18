@@ -1,154 +1,179 @@
-import mapboxgl from "mapbox-gl";
+import { useCallback, useMemo } from "react";
 import { useEffect, useRef, useState } from "react";
-import Sidebar from "../molecules/Sidebar";
-import { Button } from "../ui/button";
-import ZoomInMapRoundedIcon from "@mui/icons-material/ZoomInMapRounded";
+import { AppDispatch, RootState } from "../../state/store";
+import { useDispatch, useSelector } from "react-redux";
+import { hikePreviewAsync } from "../../state/hike/hikeSlice";
+import Map, {
+    Layer,
+    MapLayerMouseEvent,
+    MapRef,
+    Source,
+    ViewStateChangeEvent,
+} from "react-map-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+import MapboxMarker from "./MapboxMarker";
+import { setViewState } from "../../state/mapbox/mapboxSlice";
 
-const zoomLevelsDict = {
-  country: 5,
-  region: 7,
-  postcode: 9,
-  district: 11,
-  place: 13,
-  locality: 15,
-  neighborhood: 16,
-  address: 17,
-  poi: 17,
-};
+const Mapbox = () => {
+    const mapRef = useRef<MapRef>(null);
+    const mapboxAccessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+    const dispatch = useDispatch<AppDispatch>();
 
-const Mapbox = ({ selectedLocation, hikes }) => {
-  const mapContainerRef = useRef(null);
-  const map = useRef(null);
+    const viewState = useSelector((state: RootState) => state.mapbox.viewState);
 
-  const [lng, setLng] = useState(3.074001);
-  const [lat, setLat] = useState(46.959325);
-  const [zoom, setZoom] = useState(5);
+    const selectedLocation = useSelector(
+        (state: RootState) => state.location.selectedLocation
+    );
+    const hikesPreview = useSelector(
+        (state: RootState) => state.hike.hikesPreview
+    );
 
-  // Initialize map when component mounts
-  useEffect(() => {
-    map.current = new mapboxgl.Map({
-      container: mapContainerRef.current,
-      style: "mapbox://styles/rosmis/cltem9q7l002y01qwa3qk23tn/draft",
-      center: [lng, lat],
-      zoom: zoom,
-    });
+    const selectedGeoJsonHike = useSelector(
+        (state: RootState) => state.hike.selectedGeoJsonHike
+    );
 
-    map.current.on("move", () => {
-      setLng(map.current.getCenter().lng.toFixed(4));
-      setLat(map.current.getCenter().lat.toFixed(4));
-      setZoom(map.current.getZoom().toFixed(2));
-    });
+    // let bearing = 0;
+    // let timeoutId: NodeJS.Timeout;
 
-    return () => map.current.remove();
-  }, []);
+    // // camera animation
+    // const rotateCamera = () => {
+    //     if (mapRef.current && selectedLocation) {
+    //         mapRef.current.flyTo({
+    //             center: selectedLocation.coordinates,
+    //             bearing: bearing,
+    //             speed: 0.1,
+    //             pitch: 65,
+    //             curve: 1,
+    //         });
 
-  useEffect(() => {
-    if (selectedLocation && map.current) {
-      map.current.flyTo({
-        center: [
-          selectedLocation.coordinates[0],
-          selectedLocation.coordinates[1],
-        ],
-        essential: true,
-        zoom: zoomLevelsDict[selectedLocation.placeType],
-      });
+    //         bearing = (bearing + 1) % 360;
 
-      // DEBUG PURPOSES
-      map.current.addSource("circle", {
-        type: "geojson",
-        data: {
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [
-              selectedLocation.coordinates[0],
-              selectedLocation.coordinates[1],
-            ],
-          },
-        },
-      });
-      // DEBUG PURPOSES
-      map.current.addLayer({
-        id: "circle",
-        type: "circle",
-        source: "circle",
-        paint: {
-          "circle-radius": {
-            stops: [
-              [0, 0],
-              [
-                20,
-                metersToPixelsAtMaxZoom(50000, selectedLocation.coordinates[1]),
-              ],
-            ],
-            base: 2,
-          },
-          "circle-color": "#007cbf",
-          "circle-opacity": 0.3,
-        },
-      });
-    }
-  }, [selectedLocation]);
+    //         timeoutId = setTimeout(rotateCamera, 100);
+    //     }
+    // };
 
-  useEffect(() => {
-    if (hikes.length && map.current) {
-      map.current.loadImage(
-        "https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png",
-        (error, image) => {
-          if (error) throw error;
-          map.current.addImage("custom-marker", image);
+    useEffect(() => {
+        if (selectedLocation && mapRef.current) {
+            let selectedBoundingBox = selectedLocation.bbox;
 
-          map.current.addSource("points", {
-            type: "geojson",
-            data: {
-              type: "FeatureCollection",
-              features: [
-                ...hikes.map((hike) => {
-                  return {
-                    type: "Feature",
-                    geometry: {
-                      type: "Point",
-                      coordinates: [hike.longitude, hike.latitude],
-                    },
-                  };
-                }),
-              ],
-            },
-          });
+            if (selectedLocation.placeType !== "HIKE") {
+                dispatch(hikePreviewAsync(selectedLocation));
 
-          map.current.addLayer({
-            id: "points",
-            type: "symbol",
-            source: "points",
-            layout: {
-              "icon-image": "custom-marker",
-            },
-          });
+                // TODO add dynamic radius after sidebar creation with radius
+                // Recalculate bbox with radius
+                selectedBoundingBox = calculateBbox(
+                    selectedLocation.coordinates,
+                    50
+                );
+            }
+
+            mapRef.current.fitBounds(
+                [
+                    [selectedBoundingBox[0], selectedBoundingBox[1]],
+                    [selectedBoundingBox[2], selectedBoundingBox[3]],
+                ],
+                {
+                    padding: { top: 10, bottom: 25, left: 15, right: 5 },
+                }
+            );
+
+            // TODO find a way to implement this gadget feature properly
+            // rotate camera only when hike selected and not when location selected
+            // mapRef.current.once("moveend", () => {
+            //     console.log("MOVE END");
+
+            //     if (selectedLocation.placeType === "HIKE") {
+            //         rotateCamera();
+            //     }
+            // });
         }
-      );
-    }
-  }, [hikes]);
 
-  return (
-    <>
-      <div className=" b top-5 left-0 bg-red-600 z-50">
-        Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
-      </div>
+        // return () => {
+        //     clearTimeout(timeoutId);
+        // };
+    }, [dispatch, selectedLocation]);
 
-      <div
-        className="map-container h-screen w-screen"
-        ref={mapContainerRef}
-      ></div>
-      <Button onClick={handleSideBarOpen}>
-        <ZoomInMapRoundedIcon />
-      </Button>
-      <Sidebar isOpen={sideBarOpen} onClose={handleSideBarOpen}></Sidebar>
-    </>
-  );
+    const markers = useMemo(() => {
+        console.log("USE MEMO MARKERS");
+
+        return hikesPreview.map((hike, i) => {
+            return <MapboxMarker key={i} hike={hike} />;
+        });
+    }, [hikesPreview]);
+
+    const onMove = useCallback((event: ViewStateChangeEvent) => {
+        dispatch(setViewState(event.viewState));
+    }, []);
+
+    // const onClick = useCallback(() => {
+    //     console.log("click", selectedLocation, timeoutId);
+    //     if (
+    //         selectedLocation &&
+    //         selectedLocation.placeType === "HIKE" &&
+    //         timeoutId
+    //     ) {
+    //         console.log("clearing timeout");
+    //         clearTimeout(timeoutId);
+    //     }
+    // }, [selectedLocation]);
+
+    return (
+        <>
+            {/* <div className="absolute top-20 left-0 bg-red-600 z-50">
+                {JSON.stringify(viewState)}
+            </div> */}
+
+            <Map
+                initialViewState={viewState}
+                // mapStyle="mapbox://styles/mapbox/streets-v9"
+                mapStyle="mapbox://styles/rosmis/cltem9q7l002y01qwa3qk23tn"
+                mapboxAccessToken={mapboxAccessToken}
+                style={{ width: "100vw", height: "100vh" }}
+                onMove={onMove}
+                ref={mapRef}
+            >
+                {selectedGeoJsonHike && (
+                    <Source
+                        id="selected-hike"
+                        type="geojson"
+                        data={selectedGeoJsonHike}
+                    >
+                        <Layer
+                            id="hike"
+                            type="line"
+                            paint={{
+                                "line-color": "#ff0000",
+                                "line-width": 2,
+                            }}
+                        />
+                    </Source>
+                )}
+                {markers}
+            </Map>
+        </>
+    );
 };
 
-const metersToPixelsAtMaxZoom = (meters, latitude) =>
-  meters / 0.075 / Math.cos((latitude * Math.PI) / 180);
+function calculateBbox(center: number[], radiusInKm: number) {
+    const [lng, lat] = center;
+
+    // Radius of the Earth in km
+    const R = 6371;
+
+    // Angular distance in radians on a great circle
+    const radDist = radiusInKm / R;
+
+    const minLat = lat - radDist * (180 / Math.PI);
+    const maxLat = lat + radDist * (180 / Math.PI);
+
+    const deltaLng = Math.asin(
+        Math.sin(radDist) / Math.cos((lat * Math.PI) / 180)
+    );
+    const minLng = lng - deltaLng * (180 / Math.PI);
+    const maxLng = lng + deltaLng * (180 / Math.PI);
+
+    return [minLng, minLat, maxLng, maxLat];
+}
+
 export default Mapbox;

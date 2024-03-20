@@ -1,7 +1,7 @@
 import { styled } from "styled-components";
 
 const StyledInput = styled.div`
-    padding: 0.5em 1em;
+    padding: 0.3em 1em;
     border-radius: 5px;
     min-width: 350px;
     background-color: #f3f4f6;
@@ -25,18 +25,18 @@ const UiInput = ({
 
     return (
         <>
-            <StyledInput className="flex items-center gap-4">
+            <StyledInput className="flex items-center bg-slate-200 gap-4">
                 {icon}
                 <input
                     type="text"
                     placeholder={placeholder}
-                    className="outline-none w-full bg-transparent"
+                    className="outline-none w-full h-5 bg-transparent placeholder-slate-400 leading-4"
                     onChange={handleInputChange}
                     value={searchTerm}
                 />
 
                 <span
-                    className="p-2 transition-all hover:bg-slate-200 cursor-pointer rounded-lg "
+                    className="transition-all cursor-pointer"
                     onClick={handleResetInput}
                 >
                     {iconRight}

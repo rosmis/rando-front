@@ -3,7 +3,6 @@ import SearchInput from "../molecules/SearchInput";
 import debounce from "lodash.debounce";
 import UiResult from "../atoms/UiResult";
 import { FaX } from "react-icons/fa6";
-import { styled } from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../state/store";
 import {
@@ -12,14 +11,6 @@ import {
     setSearchedLocation,
     setSelectedLocation,
 } from "../../state/location/locationSlice";
-
-const StyledSearchBar = styled.div`
-    position: absolute;
-    top: 3%;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 100;
-`;
 
 const SearchBar = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -63,7 +54,7 @@ const SearchBar = () => {
     useEffect(() => debounceSearch.cancel(), [debounceSearch]);
 
     return (
-        <StyledSearchBar className="flex flex-col gap-2 items-start">
+        <div className="flex flex-col relative items-start">
             <SearchInput
                 handleInput={handleInputChange}
                 iconRight={
@@ -72,7 +63,7 @@ const SearchBar = () => {
                 searchTerm={searchedLocation}
             />
 
-            <div className="flex flex-col overflow-y-scroll">
+            <div className="absolute top-9 left-1/2 -translate-x-1/2 flex flex-col max-h-[350px] overflow-y-scroll bg-red-400">
                 {!!searchedLocation &&
                     locations.map((location, i) => {
                         return (
@@ -89,7 +80,7 @@ const SearchBar = () => {
                         );
                     })}
             </div>
-        </StyledSearchBar>
+        </div>
     );
 };
 

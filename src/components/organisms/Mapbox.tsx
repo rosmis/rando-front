@@ -9,6 +9,7 @@ import MapboxMarker from "./MapboxMarker";
 import { setViewState } from "../../state/mapbox/mapboxSlice";
 import { Button } from "@/components/ui/button";
 import { FaChevronRight } from "react-icons/fa6";
+import { toggleSidebar } from "@/state/sidebar/sidebarSlice";
 
 const Mapbox = () => {
     const mapRef = useRef<MapRef>(null);
@@ -27,6 +28,10 @@ const Mapbox = () => {
 
     const selectedGeoJsonHike = useSelector(
         (state: RootState) => state.hike.selectedGeoJsonHike
+    );
+
+    const isSidebarOpened = useSelector(
+        (state: RootState) => state.sidebar.isOpen
     );
 
     // let bearing = 0;
@@ -115,12 +120,22 @@ const Mapbox = () => {
     // }, [selectedLocation]);
 
     return (
-        <div className="relative w-full">
+        <div className="relative w-full rounded-tl-md rounded-bl-md">
             {/* <div className="absolute top-20 left-0 bg-red-600 z-50">
                 {JSON.stringify(viewState)}
             </div> */}
-            <Button className="z-10 fixed top-20 left-8">
-                <FaChevronRight size="rounded" />
+            <Button
+                className="z-10 absolute top-20 left-6"
+                onClick={() => dispatch(toggleSidebar())}
+            >
+                <FaChevronRight
+                    size="rounded"
+                    className={
+                        isSidebarOpened
+                            ? "transform transition rotate-180"
+                            : "transition"
+                    }
+                />
             </Button>
 
             <Map

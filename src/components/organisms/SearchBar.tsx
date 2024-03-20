@@ -63,7 +63,7 @@ const SearchBar = () => {
                 searchTerm={searchedLocation}
             />
 
-            <div className="absolute top-9 left-1/2 -translate-x-1/2 flex flex-col max-h-[350px] overflow-y-scroll bg-red-400">
+            <div className="absolute top-10 left-1/2 -translate-x-1/2 flex flex-col max-h-[350px] overflow-y-scroll">
                 {!!searchedLocation &&
                     locations.map((location, i) => {
                         return (

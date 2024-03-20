@@ -2,6 +2,7 @@ import Mapbox from "./components/organisms/Mapbox";
 import { RootState } from "./state/store";
 import { useSelector } from "react-redux";
 import Navbar from "./components/organisms/Navbar";
+import Sidebar from "./components/organisms/Sidebar";
 
 function App() {
     // DEBUG PURPOSES
@@ -18,7 +19,12 @@ function App() {
     return (
         <>
             <Navbar />
-            <Mapbox />
+
+            <div className="flex items-start">
+                <Sidebar />
+
+                <Mapbox />
+            </div>
         </>
     );
 }

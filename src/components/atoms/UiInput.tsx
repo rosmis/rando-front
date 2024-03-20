@@ -2,7 +2,7 @@ import { styled } from "styled-components";
 
 const StyledInput = styled.div`
     padding: 0.3em 1em;
-    border-radius: 5px;
+    border-radius: 6px;
     min-width: 350px;
     background-color: #f3f4f6;
     color: #4b5563;

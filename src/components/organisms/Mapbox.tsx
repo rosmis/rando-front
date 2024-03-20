@@ -1,18 +1,15 @@
 import { useCallback, useMemo } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { AppDispatch, RootState } from "../../state/store";
 import { useDispatch, useSelector } from "react-redux";
 import { hikePreviewAsync } from "../../state/hike/hikeSlice";
-import Map, {
-    Layer,
-    MapLayerMouseEvent,
-    MapRef,
-    Source,
-    ViewStateChangeEvent,
-} from "react-map-gl";
+import Map, { Layer, MapRef, Source, ViewStateChangeEvent } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import MapboxMarker from "./MapboxMarker";
 import { setViewState } from "../../state/mapbox/mapboxSlice";
+import { Button } from "@/components/ui/button";
+import { FaChevronRight } from "react-icons/fa6";
+import { toggleSidebar } from "@/state/sidebar/sidebarSlice";
 
 const Mapbox = () => {
     const mapRef = useRef<MapRef>(null);
@@ -31,6 +28,10 @@ const Mapbox = () => {
 
     const selectedGeoJsonHike = useSelector(
         (state: RootState) => state.hike.selectedGeoJsonHike
+    );
+
+    const isSidebarOpened = useSelector(
+        (state: RootState) => state.sidebar.isOpen
     );
 
     // let bearing = 0;
@@ -119,17 +120,30 @@ const Mapbox = () => {
     // }, [selectedLocation]);
 
     return (
-        <>
+        <div className="relative w-full rounded-tl-md rounded-bl-md">
             {/* <div className="absolute top-20 left-0 bg-red-600 z-50">
                 {JSON.stringify(viewState)}
             </div> */}
+            <Button
+                className="z-10 absolute top-20 left-6"
+                onClick={() => dispatch(toggleSidebar())}
+            >
+                <FaChevronRight
+                    size="rounded"
+                    className={
+                        isSidebarOpened
+                            ? "transform transition rotate-180"
+                            : "transition"
+                    }
+                />
+            </Button>
 
             <Map
                 initialViewState={viewState}
                 // mapStyle="mapbox://styles/mapbox/streets-v9"
                 mapStyle="mapbox://styles/rosmis/cltem9q7l002y01qwa3qk23tn"
                 mapboxAccessToken={mapboxAccessToken}
-                style={{ width: "100vw", height: "100vh" }}
+                style={{ minWidth: "65vw", maxWidth: "100vw", height: "100vh" }}
                 onMove={onMove}
                 ref={mapRef}
             >
@@ -151,7 +165,7 @@ const Mapbox = () => {
                 )}
                 {markers}
             </Map>
-        </>
+        </div>
     );
 };
 

@@ -28,20 +28,6 @@ const hikeSlice = createSlice({
     name: "hike",
     initialState,
     reducers: {
-        setHikesPreview: (
-            state,
-            action: PayloadAction<{
-                meta: {
-                    total: number;
-                };
-                data: HikePreview[];
-            }>
-        ) => {
-            state.hikesPreview = {
-                data: action.payload.data,
-                total: action.payload.meta.total,
-            };
-        },
         setSelectedHike: (state, action: PayloadAction<Hike>) => {
             state.selectedHike = action.payload;
         },
@@ -91,9 +77,13 @@ const hikeSlice = createSlice({
 
 export const hikePreviewAsync = createAsyncThunk(
     "hike/fetchHikesPreview",
-    async (location: Location) => {
+    async (location: { location: Location; page?: number }) => {
         const hikes = await fetch(
-            `http://localhost:80/api/hikes/search?latitude=${location.coordinates[1]}&longitude=${location?.coordinates[0]}&radius=50`
+            `http://localhost:80/api/hikes/search?latitude=${
+                location.location.coordinates[1]
+            }&longitude=${location.location.coordinates[0]}&radius=50${
+                location.page ? `&page=${location.page}` : ""
+            }`
         ).then((response) => response.json());
 
         return hikes;
@@ -125,7 +115,6 @@ export const gpxAsync = createAsyncThunk(
 );
 
 export const {
-    setHikesPreview,
     setSelectedHike,
     setHoveredPreviewHikeId,
     setHikesPreviewLoading,

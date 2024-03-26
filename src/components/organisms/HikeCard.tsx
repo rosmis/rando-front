@@ -16,6 +16,7 @@ const HikeCard = ({
     const dispatch = useDispatch<AppDispatch>();
 
     console.log("card rendered");
+
     return (
         <div
             className="flex flex-col gap-2 h-full rounded-md bg-white
@@ -25,7 +26,7 @@ const HikeCard = ({
         >
             {hike && !isLoading && (
                 <>
-                    <div className="flex flex-col gap-4 px-2 pt-2">
+                    <div className="flex flex-col gap-2 px-2 pt-2">
                         <HikeImageCarousel
                             backgroundImage={hike.images[0].image_url}
                         />

@@ -1,8 +1,8 @@
 import { FaChevronRight } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import { styled } from "styled-components";
 
 const StyledResult = styled.div`
-    padding: 0.5em 1em;
     width: 350px;
     background-color: #f3f4f6;
     cursor: pointer;
@@ -23,21 +23,31 @@ const UiResult = ({ location, handleSelectedLocation, ...props }) => {
         handleSelectedLocation(location);
     };
 
+    const params = new URLSearchParams();
+    params.set("search", location.name);
+    params.set("latitude", location.centerCoordinates[1]);
+    params.set("longitude", location.centerCoordinates[0]);
+
     return (
-        <StyledResult
-            {...props}
-            className="flex items-center justify-start gap-4"
-            onClick={handleSelection}
-        >
-            <FaChevronRight className="text-[#4b5563] w-fit shrink-0" />
-            <div className="flex flex-col items-start ">
-                <p className="font-bold text-[#4b5563] max-w-[300px] truncate">
-                    {location.name}
-                </p>
-                <p className="text-sm text-[#4b5563] max-w-[300px] truncate">
-                    {location.location}
-                </p>
-            </div>
+        <StyledResult {...props}>
+            <Link
+                to={{
+                    pathname: "/",
+                    search: params.toString(),
+                }}
+                className="flex items-center justify-start gap-4 px-4 py-2"
+                onClick={handleSelection}
+            >
+                <FaChevronRight className="text-[#4b5563] w-fit shrink-0" />
+                <div className="flex flex-col items-start ">
+                    <p className="font-bold text-[#4b5563] max-w-[300px] truncate">
+                        {location.name}
+                    </p>
+                    <p className="text-sm text-[#4b5563] max-w-[300px] truncate">
+                        {location.location}
+                    </p>
+                </div>
+            </Link>
         </StyledResult>
     );
 };

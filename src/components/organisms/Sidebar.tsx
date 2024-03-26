@@ -3,15 +3,7 @@ import { useSelector } from "react-redux";
 import SidebarWrapper from "../ui/SidebarWrapper";
 import HikeCard from "./HikeCard";
 import { useMemo } from "react";
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination";
+import HikePagination from "./HikePagination";
 
 const Sidebar = () => {
     const isSidebarOpened = useSelector(
@@ -22,6 +14,9 @@ const Sidebar = () => {
     );
     const isHikesPreviewFetching = useSelector(
         (state: RootState) => state.hike.isHikesPreviewLoading
+    );
+    const selectedLocation = useSelector(
+        (state: RootState) => state.location.selectedLocation
     );
 
     const searchedHikesPreview = useMemo(() => {
@@ -49,28 +44,10 @@ const Sidebar = () => {
             >
                 <SidebarWrapper>{searchedHikesPreview}</SidebarWrapper>
 
-                <Pagination>
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious href="#" />
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationLink href="#">1</PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationLink href="#">1</PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationLink href="#">1</PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationEllipsis />
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationNext href="#" />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
+                <HikePagination
+                    total={hikesPreview?.total}
+                    selectedLocation={selectedLocation}
+                />
             </aside>
         </>
     );

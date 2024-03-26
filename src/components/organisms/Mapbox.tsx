@@ -68,23 +68,23 @@ const Mapbox = () => {
                 // Delay hike preview fetch to prevent flickering
                 setTimeout(
                     async () =>
-                        await dispatch(hikePreviewAsync(selectedLocation)).then(
-                            () => {
-                                // TODO add dynamic radius after sidebar creation with radius
-                                // Recalculate bbox with radius
-                                selectedBoundingBox = calculateBbox(
-                                    selectedLocation.coordinates,
-                                    50
-                                );
+                        await dispatch(
+                            hikePreviewAsync({ location: selectedLocation })
+                        ).then(() => {
+                            // TODO add dynamic radius after sidebar creation with radius
+                            // Recalculate bbox with radius
+                            selectedBoundingBox = calculateBbox(
+                                selectedLocation.coordinates,
+                                50
+                            );
 
-                                redirectToSeletedViewport(
-                                    mapRef,
-                                    selectedBoundingBox
-                                );
+                            redirectToSeletedViewport(
+                                mapRef,
+                                selectedBoundingBox
+                            );
 
-                                dispatch(setHikesPreviewLoading(false));
-                            }
-                        ),
+                            dispatch(setHikesPreviewLoading(false));
+                        }),
                     200
                 );
 

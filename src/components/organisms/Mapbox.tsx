@@ -2,7 +2,10 @@ import { useCallback, useMemo } from "react";
 import { useEffect, useRef } from "react";
 import { AppDispatch, RootState } from "../../state/store";
 import { useDispatch, useSelector } from "react-redux";
-import { hikePreviewAsync } from "../../state/hike/hikeSlice";
+import {
+    hikePreviewAsync,
+    setHikesPreviewLoading,
+} from "../../state/hike/hikeSlice";
 import Map, { Layer, MapRef, Source, ViewStateChangeEvent } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import MapboxMarker from "./MapboxMarker";
@@ -60,6 +63,7 @@ const Mapbox = () => {
 
             if (selectedLocation.placeType !== "HIKE") {
                 dispatch(setSidebarState(true));
+                dispatch(setHikesPreviewLoading(true));
 
                 // Delay hike preview fetch to prevent flickering
                 setTimeout(
@@ -77,6 +81,8 @@ const Mapbox = () => {
                                     mapRef,
                                     selectedBoundingBox
                                 );
+
+                                dispatch(setHikesPreviewLoading(false));
                             }
                         ),
                     200

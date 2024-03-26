@@ -30,22 +30,23 @@ const hikeSlice = createSlice({
         setSelectedHike: (state, action: PayloadAction<Hike>) => {
             state.selectedHike = action.payload;
         },
-        setHoveredPreviewHikeId: (state, action: PayloadAction<number|undefined>) => {
+        setHikesPreviewLoading: (state, action: PayloadAction<boolean>) => {
+            state.isHikesPreviewLoading = action.payload;
+        },
+        setHoveredPreviewHikeId: (
+            state,
+            action: PayloadAction<number | undefined>
+        ) => {
             state.hoveredPreviewHikeId = action.payload;
         },
     },
     extraReducers: (builder) => {
-        builder
-            .addCase(hikeAsync.pending, (state) => {
-                state.isHikesPreviewLoading = true;
-            })
-            .addCase(
-                hikePreviewAsync.fulfilled,
-                (state, action: PayloadAction<HikePreview[]>) => {
-                    state.hikesPreview = action.payload;
-                    state.isHikesPreviewLoading = false;
-                }
-            );
+        builder.addCase(
+            hikePreviewAsync.fulfilled,
+            (state, action: PayloadAction<HikePreview[]>) => {
+                state.hikesPreview = action.payload;
+            }
+        );
 
         builder.addCase(
             hikeAsync.fulfilled,
@@ -97,6 +98,10 @@ export const gpxAsync = createAsyncThunk(
     }
 );
 
-export const { setHikesPreview, setSelectedHike, setHoveredPreviewHikeId } =
-    hikeSlice.actions;
+export const {
+    setHikesPreview,
+    setSelectedHike,
+    setHoveredPreviewHikeId,
+    setHikesPreviewLoading,
+} = hikeSlice.actions;
 export default hikeSlice.reducer;

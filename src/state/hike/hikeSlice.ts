@@ -5,7 +5,11 @@ import { FeatureCollection } from "geojson";
 import { gpx } from "@tmcw/togeojson";
 
 interface HikeState {
-    hikesPreview: HikePreview[];
+    hikesPreview?: {
+        data: HikePreview[];
+        total: number;
+    };
+
     selectedHike?: Hike;
     selectedGeoJsonHike?: FeatureCollection;
     hoveredPreviewHikeId?: number;
@@ -13,7 +17,7 @@ interface HikeState {
 }
 
 const initialState: HikeState = {
-    hikesPreview: [],
+    hikesPreview: undefined,
     selectedHike: undefined,
     selectedGeoJsonHike: undefined,
     isHikesPreviewLoading: false,
@@ -24,8 +28,19 @@ const hikeSlice = createSlice({
     name: "hike",
     initialState,
     reducers: {
-        setHikesPreview: (state, action: PayloadAction<HikePreview[]>) => {
-            state.hikesPreview = action.payload;
+        setHikesPreview: (
+            state,
+            action: PayloadAction<{
+                meta: {
+                    total: number;
+                };
+                data: HikePreview[];
+            }>
+        ) => {
+            state.hikesPreview = {
+                data: action.payload.data,
+                total: action.payload.meta.total,
+            };
         },
         setSelectedHike: (state, action: PayloadAction<Hike>) => {
             state.selectedHike = action.payload;
@@ -43,8 +58,19 @@ const hikeSlice = createSlice({
     extraReducers: (builder) => {
         builder.addCase(
             hikePreviewAsync.fulfilled,
-            (state, action: PayloadAction<HikePreview[]>) => {
-                state.hikesPreview = action.payload;
+            (
+                state,
+                action: PayloadAction<{
+                    meta: {
+                        total: number;
+                    };
+                    data: HikePreview[];
+                }>
+            ) => {
+                state.hikesPreview = {
+                    data: action.payload.data,
+                    total: action.payload.meta.total,
+                };
             }
         );
 
@@ -70,7 +96,7 @@ export const hikePreviewAsync = createAsyncThunk(
             `http://localhost:80/api/hikes/search?latitude=${location.coordinates[1]}&longitude=${location?.coordinates[0]}&radius=50`
         ).then((response) => response.json());
 
-        return hikes.data;
+        return hikes;
     }
 );
 

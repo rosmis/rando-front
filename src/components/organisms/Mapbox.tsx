@@ -110,9 +110,11 @@ const Mapbox = () => {
     }, [dispatch, selectedLocation]);
 
     const markers = useMemo(() => {
+        if (!hikesPreview) return;
+
         console.log("USE MEMO MARKERS");
 
-        return hikesPreview.map((hike, i) => {
+        return hikesPreview?.data.map((hike, i) => {
             return <MapboxMarker key={i} hike={hike} />;
         });
     }, [hikesPreview]);

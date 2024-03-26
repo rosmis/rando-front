@@ -3,6 +3,15 @@ import { useSelector } from "react-redux";
 import SidebarWrapper from "../ui/SidebarWrapper";
 import HikeCard from "./HikeCard";
 import { useMemo } from "react";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination";
 
 const Sidebar = () => {
     const isSidebarOpened = useSelector(
@@ -22,7 +31,11 @@ const Sidebar = () => {
             });
         }
 
-        return hikesPreview.map((hike) => {
+        if (!hikesPreview) return;
+
+        console.log(hikesPreview);
+
+        return hikesPreview.data.map((hike) => {
             return <HikeCard key={hike.id} hike={hike} />;
         });
     }, [hikesPreview, isHikesPreviewFetching]);
@@ -35,6 +48,29 @@ const Sidebar = () => {
                 }`}
             >
                 <SidebarWrapper>{searchedHikesPreview}</SidebarWrapper>
+
+                <Pagination>
+                    <PaginationContent>
+                        <PaginationItem>
+                            <PaginationPrevious href="#" />
+                        </PaginationItem>
+                        <PaginationItem>
+                            <PaginationLink href="#">1</PaginationLink>
+                        </PaginationItem>
+                        <PaginationItem>
+                            <PaginationLink href="#">1</PaginationLink>
+                        </PaginationItem>
+                        <PaginationItem>
+                            <PaginationLink href="#">1</PaginationLink>
+                        </PaginationItem>
+                        <PaginationItem>
+                            <PaginationEllipsis />
+                        </PaginationItem>
+                        <PaginationItem>
+                            <PaginationNext href="#" />
+                        </PaginationItem>
+                    </PaginationContent>
+                </Pagination>
             </aside>
         </>
     );

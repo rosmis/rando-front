@@ -40,7 +40,7 @@ const HikePagination = ({
     return (
         total &&
         total > 10 && (
-            <Pagination>
+            <Pagination className="mt-4">
                 <PaginationContent>
                     <PaginationItem>
                         <Link

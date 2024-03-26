@@ -32,7 +32,7 @@ const HikeCard = ({
                         />
                         <div className="flex items-center justify-between">
                             <div className="flex flex-col items-start">
-                                <h2 className="max-w-[19rem] truncate font-bold">
+                                <h2 className="max-w-[16.5rem] truncate font-bold">
                                     {hike.title}
                                 </h2>
                                 <h3 className="text-sm text-slate-500">

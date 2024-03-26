@@ -14,8 +14,6 @@ const Sidebar = () => {
     const isHikesPreviewFetching = useSelector(
         (state: RootState) => state.hike.isHikesPreviewLoading
     );
-    const hikeState = useSelector((state: RootState) => state.hike); 
-    console.log(hikeState);
 
     const searchedHikesPreview = useMemo(() => {
         if (isHikesPreviewFetching) {

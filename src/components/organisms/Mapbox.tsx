@@ -9,7 +9,7 @@ import MapboxMarker from "./MapboxMarker";
 import { setViewState } from "../../state/mapbox/mapboxSlice";
 import { Button } from "@/components/ui/button";
 import { FaChevronRight } from "react-icons/fa6";
-import { toggleSidebar } from "@/state/sidebar/sidebarSlice";
+import { setSidebarState, toggleSidebar } from "@/state/sidebar/sidebarSlice";
 
 const Mapbox = () => {
     const mapRef = useRef<MapRef>(null);
@@ -59,7 +59,14 @@ const Mapbox = () => {
             let selectedBoundingBox = selectedLocation.bbox;
 
             if (selectedLocation.placeType !== "HIKE") {
-                dispatch(hikePreviewAsync(selectedLocation));
+                dispatch(setSidebarState(true));
+
+                // Delay hike preview fetch to prevent flickering
+                setTimeout(
+                    async () =>
+                        await dispatch(hikePreviewAsync(selectedLocation)),
+                    500
+                );
 
                 // TODO add dynamic radius after sidebar creation with radius
                 // Recalculate bbox with radius

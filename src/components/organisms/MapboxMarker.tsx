@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../state/store";
 import { setSelectedLocation } from "../../state/location/locationSlice";
 import { gpxAsync, hikeAsync } from "../../state/hike/hikeSlice";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Feature, LineString } from "geojson";
 import { PayloadAction } from "@reduxjs/toolkit";
 
@@ -17,6 +17,9 @@ const MapboxMarker = ({ hike }: { hike: HikePreview }) => {
     );
     const selectedGeoJsonHike = useSelector(
         (state: RootState) => state.hike.selectedGeoJsonHike
+    );
+    const hoveredHikePreviewId = useSelector(
+        (state: RootState) => state.hike.hoveredPreviewHikeId
     );
 
     console.log("render MARKER");
@@ -71,6 +74,15 @@ const MapboxMarker = ({ hike }: { hike: HikePreview }) => {
         }
     }, [selectedGeoJsonHike, selectedHike, dispatch, hike.id]);
 
+    const markerOpacity = useMemo(() => {
+        if (hoveredHikePreviewId === hike.id) return 1;
+
+        if (!selectedHike && !hoveredHikePreviewId) return 1;
+        if (selectedHike && selectedHike.id === hike.id) return 1;
+
+        return 0.5;
+    }, [selectedHike, hoveredHikePreviewId, hike.id]);
+
     return (
         <>
             <Marker
@@ -84,12 +96,9 @@ const MapboxMarker = ({ hike }: { hike: HikePreview }) => {
                 <FaLocationDot
                     size={30}
                     color="#ad4343"
+                    // color="#ad4343"
                     style={{
-                        opacity: !selectedHike
-                            ? 1
-                            : selectedHike.id === hike.id
-                            ? 1
-                            : 0.5,
+                        opacity: markerOpacity,
                     }}
                 />
             </Marker>

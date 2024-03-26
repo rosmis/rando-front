@@ -2,6 +2,9 @@ import { HikePreview } from "@/types/hikes";
 import HikeImageCarousel from "../molecules/HikeImageCarousel";
 import HikeIcons from "./HikeIcons";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/state/store";
+import { setHoveredPreviewHikeId } from "@/state/hike/hikeSlice";
 
 const HikeCard = ({
     hike,
@@ -10,10 +13,15 @@ const HikeCard = ({
     hike?: HikePreview;
     isLoading?: boolean;
 }) => {
+    const dispatch = useDispatch<AppDispatch>();
+
+    console.log("card rendered");
     return (
         <div
             className="flex flex-col gap-2 h-full rounded-md bg-white
              w-full border cursor-pointer hover:bg-slate-50 transition-all border-slate-200"
+            onMouseEnter={() => dispatch(setHoveredPreviewHikeId(hike?.id))}
+            onMouseLeave={() => dispatch(setHoveredPreviewHikeId(undefined))}
         >
             {hike && !isLoading && (
                 <>

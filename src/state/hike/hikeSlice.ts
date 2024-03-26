@@ -8,6 +8,7 @@ interface HikeState {
     hikesPreview: HikePreview[];
     selectedHike?: Hike;
     selectedGeoJsonHike?: FeatureCollection;
+    hoveredPreviewHikeId?: number;
     isHikesPreviewLoading: boolean;
 }
 
@@ -16,6 +17,7 @@ const initialState: HikeState = {
     selectedHike: undefined,
     selectedGeoJsonHike: undefined,
     isHikesPreviewLoading: false,
+    hoveredPreviewHikeId: undefined,
 };
 
 const hikeSlice = createSlice({
@@ -27,6 +29,9 @@ const hikeSlice = createSlice({
         },
         setSelectedHike: (state, action: PayloadAction<Hike>) => {
             state.selectedHike = action.payload;
+        },
+        setHoveredPreviewHikeId: (state, action: PayloadAction<number|undefined>) => {
+            state.hoveredPreviewHikeId = action.payload;
         },
     },
     extraReducers: (builder) => {
@@ -92,5 +97,6 @@ export const gpxAsync = createAsyncThunk(
     }
 );
 
-export const { setHikesPreview, setSelectedHike } = hikeSlice.actions;
+export const { setHikesPreview, setSelectedHike, setHoveredPreviewHikeId } =
+    hikeSlice.actions;
 export default hikeSlice.reducer;

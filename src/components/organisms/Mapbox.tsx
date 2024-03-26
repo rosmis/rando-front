@@ -165,6 +165,10 @@ const Mapbox = () => {
                 )}
                 {markers}
             </Map>
+            {/* <div
+                style={{ minWidth: "65vw", maxWidth: "100vw", height: "100vh" }}
+                className="bg-red-600"
+            ></div> */}
         </div>
     );
 };

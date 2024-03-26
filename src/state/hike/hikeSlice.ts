@@ -8,12 +8,14 @@ interface HikeState {
     hikesPreview: HikePreview[];
     selectedHike?: Hike;
     selectedGeoJsonHike?: FeatureCollection;
+    isHikesPreviewLoading: boolean;
 }
 
 const initialState: HikeState = {
     hikesPreview: [],
     selectedHike: undefined,
     selectedGeoJsonHike: undefined,
+    isHikesPreviewLoading: true,
 };
 
 const hikeSlice = createSlice({
@@ -28,12 +30,18 @@ const hikeSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        builder.addCase(
-            hikePreviewAsync.fulfilled,
-            (state, action: PayloadAction<HikePreview[]>) => {
-                state.hikesPreview = action.payload;
-            }
-        );
+        builder
+            .addCase(hikeAsync.pending, (state) => {
+                state.isHikesPreviewLoading = true;
+            })
+            .addCase(
+                hikePreviewAsync.fulfilled,
+                (state, action: PayloadAction<HikePreview[]>) => {
+                    state.hikesPreview = action.payload;
+                    state.isHikesPreviewLoading = false;
+                }
+            );
+
         builder.addCase(
             hikeAsync.fulfilled,
             (state, action: PayloadAction<Hike>) => {

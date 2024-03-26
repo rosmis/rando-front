@@ -64,27 +64,28 @@ const Mapbox = () => {
                 // Delay hike preview fetch to prevent flickering
                 setTimeout(
                     async () =>
-                        await dispatch(hikePreviewAsync(selectedLocation)),
-                    500
+                        await dispatch(hikePreviewAsync(selectedLocation)).then(
+                            () => {
+                                // TODO add dynamic radius after sidebar creation with radius
+                                // Recalculate bbox with radius
+                                selectedBoundingBox = calculateBbox(
+                                    selectedLocation.coordinates,
+                                    50
+                                );
+
+                                redirectToSeletedViewport(
+                                    mapRef,
+                                    selectedBoundingBox
+                                );
+                            }
+                        ),
+                    200
                 );
 
-                // TODO add dynamic radius after sidebar creation with radius
-                // Recalculate bbox with radius
-                selectedBoundingBox = calculateBbox(
-                    selectedLocation.coordinates,
-                    50
-                );
+                return;
             }
 
-            mapRef.current.fitBounds(
-                [
-                    [selectedBoundingBox[0], selectedBoundingBox[1]],
-                    [selectedBoundingBox[2], selectedBoundingBox[3]],
-                ],
-                {
-                    padding: { top: 10, bottom: 25, left: 15, right: 5 },
-                }
-            );
+            redirectToSeletedViewport(mapRef, selectedBoundingBox);
 
             // TODO find a way to implement this gadget feature properly
             // rotate camera only when hike selected and not when location selected
@@ -199,6 +200,21 @@ function calculateBbox(center: number[], radiusInKm: number) {
     const maxLng = lng + deltaLng * (180 / Math.PI);
 
     return [minLng, minLat, maxLng, maxLat];
+}
+
+function redirectToSeletedViewport(
+    mapRef: React.RefObject<MapRef>,
+    selectedBoundingBox: number[]
+) {
+    return mapRef.current?.fitBounds(
+        [
+            [selectedBoundingBox[0], selectedBoundingBox[1]],
+            [selectedBoundingBox[2], selectedBoundingBox[3]],
+        ],
+        {
+            padding: { top: 10, bottom: 25, left: 15, right: 5 },
+        }
+    );
 }
 
 export default Mapbox;

@@ -1,13 +1,14 @@
 import { HikePreview } from "@/types/hikes";
 import HikeImageCarousel from "../molecules/HikeImageCarousel";
 import HikeIcons from "./HikeIcons";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const HikeCard = ({
     hike,
     isLoading,
 }: {
     hike?: HikePreview;
-    isLoading: boolean;
+    isLoading?: boolean;
 }) => {
     return (
         <div
@@ -40,7 +41,16 @@ const HikeCard = ({
                 </>
             )}
 
-            
+            {isLoading && (
+                <div className="flex flex-col gap-4 p-2">
+                    <Skeleton className="h-32 w-full" />
+
+                    <div className="flex flex-col gap-1 items-start">
+                        <Skeleton className="w-[14rem] h-4" />
+                        <Skeleton className="w-10 h-4" />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

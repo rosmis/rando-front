@@ -144,7 +144,7 @@ const Mapbox = () => {
                 mapStyle="mapbox://styles/rosmis/cltem9q7l002y01qwa3qk23tn"
                 mapboxAccessToken={mapboxAccessToken}
                 style={{ minWidth: "65vw", maxWidth: "100vw", height: "100vh" }}
-                onMove={onMove}
+                // onMove={onMove}
                 ref={mapRef}
             >
                 {selectedGeoJsonHike && (

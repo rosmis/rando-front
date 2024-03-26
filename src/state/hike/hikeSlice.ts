@@ -15,7 +15,7 @@ const initialState: HikeState = {
     hikesPreview: [],
     selectedHike: undefined,
     selectedGeoJsonHike: undefined,
-    isHikesPreviewLoading: true,
+    isHikesPreviewLoading: false,
 };
 
 const hikeSlice = createSlice({

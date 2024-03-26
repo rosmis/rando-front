@@ -11,17 +11,23 @@ const Sidebar = () => {
     const hikesPreview = useSelector(
         (state: RootState) => state.hike.hikesPreview
     );
-    const isHikesPreviewLoading = useSelector(
+    const isHikesPreviewFetching = useSelector(
         (state: RootState) => state.hike.isHikesPreviewLoading
     );
+    const hikeState = useSelector((state: RootState) => state.hike); 
+    console.log(hikeState);
 
     const searchedHikesPreview = useMemo(() => {
-        if (isHikesPreviewLoading) {
+        if (isHikesPreviewFetching) {
             return Array.from({ length: 3 }, (_, i) => {
-                return "hello";
+                return <HikeCard key={i} isLoading />;
             });
         }
-    }, [hikesPreview]);
+
+        return hikesPreview.map((hike) => {
+            return <HikeCard key={hike.id} hike={hike} />;
+        });
+    }, [hikesPreview, isHikesPreviewFetching]);
 
     return (
         <>
@@ -30,12 +36,7 @@ const Sidebar = () => {
                     isSidebarOpened ? "mr-0" : "-mr-[35%]"
                 }`}
             >
-                <SidebarWrapper>
-                    {!!hikesPreview.length &&
-                        hikesPreview.map((hike) => {
-                            return <HikeCard key={hike.id} hike={hike} />;
-                        })}
-                </SidebarWrapper>
+                <SidebarWrapper>{searchedHikesPreview}</SidebarWrapper>
             </aside>
         </>
     );

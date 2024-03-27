@@ -49,8 +49,8 @@ const Sidebar = () => {
     return (
         <>
             <aside
-                className={`pt-14 w-[35vw] bg-[#F5F5F5] transition-all duration-300 h-screen ${
-                    isSidebarOpened ? "mr-0" : "-mr-[35%]"
+                className={`pt-14 w-[27rem] bg-white transition-all duration-300 h-screen ${
+                    isSidebarOpened ? "mr-0" : "-mr-[27rem]"
                 }`}
             >
                 <SidebarWrapper>

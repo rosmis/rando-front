@@ -13,9 +13,11 @@ import { setViewState } from "../../state/mapbox/mapboxSlice";
 import { Button } from "@/components/ui/button";
 import { FaChevronRight } from "react-icons/fa6";
 import { setSidebarState, toggleSidebar } from "@/state/sidebar/sidebarSlice";
+import { useMapRef } from "@/composables/useMapRef";
+import { setSelectedLocationBoundingBox } from "@/state/location/locationSlice";
 
 const Mapbox = () => {
-    const mapRef = useRef<MapRef>(null);
+    const mapRef = useMapRef();
     const mapboxAccessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
     const dispatch = useDispatch<AppDispatch>();
@@ -84,6 +86,11 @@ const Mapbox = () => {
                             );
 
                             dispatch(setHikesPreviewLoading(false));
+                            dispatch(
+                                setSelectedLocationBoundingBox(
+                                    selectedBoundingBox
+                                )
+                            );
                         }),
                     200
                 );
@@ -112,7 +119,7 @@ const Mapbox = () => {
     const markers = useMemo(() => {
         if (!hikesPreview) return;
 
-        console.log("USE MEMO MARKERS");
+        // console.log("USE MEMO MARKERS");
 
         return hikesPreview?.data.map((hike, i) => {
             return <MapboxMarker key={i} hike={hike} />;
@@ -159,7 +166,7 @@ const Mapbox = () => {
                 // mapStyle="mapbox://styles/mapbox/streets-v9"
                 mapStyle="mapbox://styles/rosmis/cltem9q7l002y01qwa3qk23tn"
                 mapboxAccessToken={mapboxAccessToken}
-                style={{ minWidth: "65vw", maxWidth: "100vw", height: "100vh" }}
+                style={{ maxWidth: "100vw", height: "100vh" }}
                 // onMove={onMove}
                 ref={mapRef}
             >

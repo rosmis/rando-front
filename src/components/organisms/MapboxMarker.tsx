@@ -22,7 +22,6 @@ const MapboxMarker = ({ hike }: { hike: HikePreview }) => {
         (state: RootState) => state.hike.hoveredPreviewHikeId
     );
 
-    console.log("render MARKER");
 
     const handleHikeSelection = async () => {
         console.log("clicked handleHikeSelection");

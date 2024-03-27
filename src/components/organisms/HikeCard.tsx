@@ -33,7 +33,6 @@ const HikeCard = ({
         dispatch(gpxAsync(hikePayload.payload.gpx_url));
     }, [dispatch, hike]);
 
-    console.log("card rendered");
 
     return (
         <Link

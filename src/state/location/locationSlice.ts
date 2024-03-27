@@ -18,12 +18,14 @@ interface ResultLocation {
 interface LocationState {
     searchedLocation: string;
     selectedLocation?: Location;
+    selectedLocationBoundingBox?: number[];
     locations: ResultLocation[];
 }
 
 const initialState: LocationState = {
     searchedLocation: "",
     selectedLocation: undefined,
+    selectedLocationBoundingBox: undefined,
     locations: [],
 };
 
@@ -36,6 +38,12 @@ const locationSlice = createSlice({
         },
         setSelectedLocation: (state, action: PayloadAction<Location>) => {
             state.selectedLocation = action.payload;
+        },
+        setSelectedLocationBoundingBox: (
+            state,
+            action: PayloadAction<number[] | undefined>
+        ) => {
+            state.selectedLocationBoundingBox = action.payload;
         },
         setLocations: (state, action: PayloadAction<ResultLocation[]>) => {
             state.locations = action.payload;
@@ -74,7 +82,11 @@ export const locationsAsync = createAsyncThunk(
     }
 );
 
-export const { setSearchedLocation, setSelectedLocation, setLocations } =
-    locationSlice.actions;
+export const {
+    setSearchedLocation,
+    setSelectedLocation,
+    setLocations,
+    setSelectedLocationBoundingBox,
+} = locationSlice.actions;
 
 export default locationSlice.reducer;

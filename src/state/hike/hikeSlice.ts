@@ -28,11 +28,17 @@ const hikeSlice = createSlice({
     name: "hike",
     initialState,
     reducers: {
-        setSelectedHike: (state, action: PayloadAction<Hike>) => {
+        setSelectedHike: (state, action: PayloadAction<Hike|undefined>) => {
             state.selectedHike = action.payload;
         },
         setHikesPreviewLoading: (state, action: PayloadAction<boolean>) => {
             state.isHikesPreviewLoading = action.payload;
+        },
+        setSelectedGeoJsonHike: (
+            state,
+            action: PayloadAction<FeatureCollection|undefined>
+        ) => {
+            state.selectedGeoJsonHike = action.payload;
         },
         setHoveredPreviewHikeId: (
             state,
@@ -118,5 +124,6 @@ export const {
     setSelectedHike,
     setHoveredPreviewHikeId,
     setHikesPreviewLoading,
+    setSelectedGeoJsonHike,
 } = hikeSlice.actions;
 export default hikeSlice.reducer;

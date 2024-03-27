@@ -1,10 +1,17 @@
-import { HikePreview } from "@/types/hikes";
+import { Hike, HikePreview } from "@/types/hikes";
 import HikeImageCarousel from "../molecules/HikeImageCarousel";
 import HikeIcons from "./HikeIcons";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/state/store";
-import { setHoveredPreviewHikeId } from "@/state/hike/hikeSlice";
+import {
+    gpxAsync,
+    hikeAsync,
+    setHoveredPreviewHikeId,
+} from "@/state/hike/hikeSlice";
+import { Link } from "react-router-dom";
+import { useCallback } from "react";
+import { PayloadAction } from "@reduxjs/toolkit";
 
 const HikeCard = ({
     hike,
@@ -15,14 +22,27 @@ const HikeCard = ({
 }) => {
     const dispatch = useDispatch<AppDispatch>();
 
+    const handleHikeSelection = useCallback(async () => {
+        if (!hike) return;
+        console.log("clicked handleHikeSelection");
+
+        const hikePayload: PayloadAction<Hike> = await dispatch(
+            hikeAsync(hike.id)
+        );
+
+        dispatch(gpxAsync(hikePayload.payload.gpx_url));
+    }, [dispatch, hike]);
+
     console.log("card rendered");
 
     return (
-        <div
+        <Link
+            to={`/hike/${hike?.id}`}
             className="flex flex-col gap-2 h-full rounded-md bg-white
              w-full border cursor-pointer hover:bg-slate-50 transition-all border-slate-200"
             onMouseEnter={() => dispatch(setHoveredPreviewHikeId(hike?.id))}
             onMouseLeave={() => dispatch(setHoveredPreviewHikeId(undefined))}
+            onClick={handleHikeSelection}
         >
             {hike && !isLoading && (
                 <>
@@ -40,7 +60,7 @@ const HikeCard = ({
                                 </h3>
                             </div>
 
-                            <span className="font-bold whitespace-nowrap p-1 bg-white rounded-md">
+                            <span className="font-bold whitespace-nowrap p-1 rounded-md">
                                 {hike.distance / 1000} Km
                             </span>
                         </div>
@@ -60,7 +80,7 @@ const HikeCard = ({
                     </div>
                 </div>
             )}
-        </div>
+        </Link>
     );
 };
 

@@ -2,7 +2,7 @@ import UiIcon from "../atoms/UiIcon";
 
 const HikeIcon = ({ icon, ...props }: { icon: string }) => {
     return (
-        <div className="flex items-center gap-1 p-1 bg-white rounded-md">
+        <div className="flex items-center gap-1 p-1 rounded-md">
             <UiIcon icon={icon} />
 
             {props.children && (

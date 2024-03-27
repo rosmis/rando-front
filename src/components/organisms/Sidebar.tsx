@@ -4,6 +4,8 @@ import SidebarWrapper from "../ui/SidebarWrapper";
 import HikeCard from "./HikeCard";
 import { useMemo } from "react";
 import HikePagination from "./HikePagination";
+import { Route, Routes } from "react-router-dom";
+import HikeDetails from "./HikeDetails";
 
 const Sidebar = () => {
     const isSidebarOpened = useSelector(
@@ -30,24 +32,33 @@ const Sidebar = () => {
 
         console.log(hikesPreview);
 
-        return hikesPreview.data.map((hike) => {
-            return <HikeCard key={hike.id} hike={hike} />;
-        });
-    }, [hikesPreview, isHikesPreviewFetching]);
-
-    return (
-        <>
-            <aside
-                className={`pt-14 pb-16 w-[35vw] bg-white transition-all duration-300 h-screen ${
-                    isSidebarOpened ? "mr-0" : "-mr-[35%]"
-                }`}
-            >
-                <SidebarWrapper>{searchedHikesPreview}</SidebarWrapper>
+        return (
+            <>
+                {...hikesPreview.data.map((hike) => {
+                    return <HikeCard key={hike.id} hike={hike} />;
+                })}
 
                 <HikePagination
                     total={hikesPreview?.total}
                     selectedLocation={selectedLocation}
                 />
+            </>
+        );
+    }, [hikesPreview, isHikesPreviewFetching, selectedLocation]);
+
+    return (
+        <>
+            <aside
+                className={`pt-14 w-[35vw] bg-[#F5F5F5] transition-all duration-300 h-screen ${
+                    isSidebarOpened ? "mr-0" : "-mr-[35%]"
+                }`}
+            >
+                <SidebarWrapper>
+                    <Routes>
+                        <Route path="/" element={searchedHikesPreview} />
+                        <Route path="/hike/:hikeId" element={<HikeDetails />} />
+                    </Routes>
+                </SidebarWrapper>
             </aside>
         </>
     );

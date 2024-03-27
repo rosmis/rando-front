@@ -1,7 +1,5 @@
 import React from "react";
 import { styled } from "styled-components";
-import UiIcon from "./UiIcon";
-import icons from "@/assets/icons/icons";
 
 const StyledInput = styled.div`
     padding: 0.3em 1em;
@@ -29,6 +27,9 @@ const UiInput = ({
         handleInput("");
     };
 
+    const isMac = window.navigator.userAgent.includes("Mac");
+    const shortcut = isMac ? "⌘K" : "Ctrl+K";
+
     // Toggle the searchbar when ⌘/ctrk + K is pressed
     React.useEffect(() => {
         const down = (e) => {
@@ -39,6 +40,8 @@ const UiInput = ({
 
             if (e.key === "Escape" && inputRef.current) {
                 inputRef.current.blur();
+
+                return handleKeyUp(e);
             }
         };
 
@@ -68,8 +71,8 @@ const UiInput = ({
                 </span>
 
                 {!searchTerm && (
-                    <span className="flex items-center gap-[2px] text-sm font-normal text-[#4b5563]">
-                        <UiIcon icon={icons.command} size="small" />K
+                    <span className="items-center hidden md:flex gap-[2px] text-sm font-normal text-[#4b5563]">
+                        {shortcut}
                     </span>
                 )}
             </StyledInput>

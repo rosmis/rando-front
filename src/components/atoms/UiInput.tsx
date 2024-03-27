@@ -15,7 +15,6 @@ const UiInput = ({
     iconRight = <></>,
     searchTerm = "",
     handleKeyUp,
-    handleBlur
 }) => {
     const handleInputChange = (e) => {
         handleInput(e.target.value);
@@ -36,7 +35,6 @@ const UiInput = ({
                     onChange={handleInputChange}
                     value={searchTerm}
                     onKeyUpCapture={handleKeyUp}
-                    onBlur={handleBlur}
                 />
 
                 <span

@@ -1,7 +1,12 @@
 import { FaSearch } from "react-icons/fa";
 import UiInput from "../atoms/UiInput";
 
-const SearchInput = ({ handleInput, iconRight = <></>, searchTerm = "" ,handleKeyUp,handleBlur}) => {
+const SearchInput = ({
+    handleInput,
+    iconRight = <></>,
+    searchTerm = "",
+    handleKeyUp,
+}) => {
     return (
         <UiInput
             icon={<FaSearch className="text-[#4b5563]" />}
@@ -9,7 +14,6 @@ const SearchInput = ({ handleInput, iconRight = <></>, searchTerm = "" ,handleKe
             iconRight={iconRight}
             searchTerm={searchTerm}
             handleKeyUp={handleKeyUp}
-            handleBlur={handleBlur}
         />
     );
 };

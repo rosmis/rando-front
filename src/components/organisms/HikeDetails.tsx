@@ -9,6 +9,9 @@ import {
     setSelectedGeoJsonHike,
     setSelectedHike,
 } from "@/state/hike/hikeSlice";
+import HikePercs from "../molecules/HikePercs";
+import icons from "@/assets/icons/icons";
+import { HikeDifficulty } from "@/types/hikes";
 
 const HikeDetails = () => {
     const selectedHike = useSelector(
@@ -34,7 +37,7 @@ const HikeDetails = () => {
     };
 
     return (
-        <div className="flex flex-col items-start gap-4">
+        <div className="flex flex-col items-start max-w-full gap-4 p-2">
             <Button
                 size="xs"
                 variant={"ghost"}
@@ -50,9 +53,69 @@ const HikeDetails = () => {
                 className="rounded-md w-full bg-cover h-[12rem]"
             />
 
-            <pre className="whitespace-pre">
-                {JSON.stringify(selectedLocationBoundingBox)}
-            </pre>
+            <div className="flex flex-col gap-4">
+                <div className="flex flex-col items-start">
+                    <h1 className="font-bold text-lg">{selectedHike?.title}</h1>
+                    <h2 className="text-md text-slate-400">
+                        {selectedHike?.municipality}
+                    </h2>
+                </div>
+                <div
+                    className="leading-6 text-slate-500 max-w-full"
+                    dangerouslySetInnerHTML={{
+                        __html: selectedHike?.excerpt as string,
+                    }}
+                ></div>
+
+                <div className="grid grid-cols-3 gap-2">
+                    <HikePercs
+                        icon={icons.personHiking}
+                        title={`${selectedHike?.distance / 1000} km`}
+                        content="Distance"
+                    />
+
+                    <HikePercs
+                        icon={icons.clock}
+                        title={selectedHike?.duration}
+                        content="Durée moyenne"
+                    />
+
+                    <HikePercs
+                        icon={icons[`dial${selectedHike?.difficulty}`]}
+                        title={
+                            HikeDifficulty[
+                                selectedHike?.difficulty.toUpperCase() as keyof typeof HikeDifficulty
+                            ]
+                        }
+                        content="Difficulté"
+                    />
+
+                    <HikePercs
+                        icon={icons.mountainHigh}
+                        title={selectedHike?.highest_point + " m"}
+                        content="Point le plus haut"
+                    />
+
+                    <HikePercs
+                        icon={icons.mountainLow}
+                        title={selectedHike?.lowest_point + " m"}
+                        content="Point le plus bas"
+                    />
+
+                    <HikePercs
+                        icon={icons.arrowUpRightDots}
+                        title={selectedHike?.positive_elevation + " m"}
+                        content="Élévation positive"
+                    />
+                </div>
+
+                <div
+                    className="leading-7 max-w-full"
+                    dangerouslySetInnerHTML={{
+                        __html: selectedHike?.description as string,
+                    }}
+                ></div>
+            </div>
         </div>
     );
 };

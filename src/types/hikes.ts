@@ -41,7 +41,7 @@ export interface Hike {
 }
 
 export enum HikeDifficulty {
-    EASY = "easy",
-    MEDIUM = "medium",
-    HARD = "hard",
+    EASY = "Facile",
+    MEDIUM = "Moyenne",
+    HARD = "Difficile",
 }

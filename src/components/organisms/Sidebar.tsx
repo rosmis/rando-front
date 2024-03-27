@@ -49,7 +49,7 @@ const Sidebar = () => {
     return (
         <>
             <aside
-                className={`pt-14 w-[27rem] bg-white transition-all duration-300 h-screen ${
+                className={`pt-14 min-w-[27rem] w-[27rem] bg-white transition-all duration-300 h-screen ${
                     isSidebarOpened ? "mr-0" : "-mr-[27rem]"
                 }`}
             >

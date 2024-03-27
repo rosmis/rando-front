@@ -5,35 +5,67 @@ import { FeatureCollection } from "geojson";
 import { gpx } from "@tmcw/togeojson";
 
 interface HikeState {
-    hikesPreview: HikePreview[];
+    hikesPreview?: {
+        data: HikePreview[];
+        total: number;
+    };
+
     selectedHike?: Hike;
     selectedGeoJsonHike?: FeatureCollection;
+    hoveredPreviewHikeId?: number;
+    isHikesPreviewLoading: boolean;
 }
 
 const initialState: HikeState = {
-    hikesPreview: [],
+    hikesPreview: undefined,
     selectedHike: undefined,
     selectedGeoJsonHike: undefined,
+    isHikesPreviewLoading: false,
+    hoveredPreviewHikeId: undefined,
 };
 
 const hikeSlice = createSlice({
     name: "hike",
     initialState,
     reducers: {
-        setHikesPreview: (state, action: PayloadAction<HikePreview[]>) => {
-            state.hikesPreview = action.payload;
-        },
-        setSelectedHike: (state, action: PayloadAction<Hike>) => {
+        setSelectedHike: (state, action: PayloadAction<Hike|undefined>) => {
             state.selectedHike = action.payload;
+        },
+        setHikesPreviewLoading: (state, action: PayloadAction<boolean>) => {
+            state.isHikesPreviewLoading = action.payload;
+        },
+        setSelectedGeoJsonHike: (
+            state,
+            action: PayloadAction<FeatureCollection|undefined>
+        ) => {
+            state.selectedGeoJsonHike = action.payload;
+        },
+        setHoveredPreviewHikeId: (
+            state,
+            action: PayloadAction<number | undefined>
+        ) => {
+            state.hoveredPreviewHikeId = action.payload;
         },
     },
     extraReducers: (builder) => {
         builder.addCase(
             hikePreviewAsync.fulfilled,
-            (state, action: PayloadAction<HikePreview[]>) => {
-                state.hikesPreview = action.payload;
+            (
+                state,
+                action: PayloadAction<{
+                    meta: {
+                        total: number;
+                    };
+                    data: HikePreview[];
+                }>
+            ) => {
+                state.hikesPreview = {
+                    data: action.payload.data,
+                    total: action.payload.meta.total,
+                };
             }
         );
+
         builder.addCase(
             hikeAsync.fulfilled,
             (state, action: PayloadAction<Hike>) => {
@@ -51,12 +83,16 @@ const hikeSlice = createSlice({
 
 export const hikePreviewAsync = createAsyncThunk(
     "hike/fetchHikesPreview",
-    async (location: Location) => {
+    async (location: { location: Location; page?: number }) => {
         const hikes = await fetch(
-            `http://localhost:80/api/hikes/search?latitude=${location.coordinates[1]}&longitude=${location?.coordinates[0]}&radius=50`
+            `http://localhost:80/api/hikes/search?latitude=${
+                location.location.coordinates[1]
+            }&longitude=${location.location.coordinates[0]}&radius=50${
+                location.page ? `&page=${location.page}` : ""
+            }`
         ).then((response) => response.json());
 
-        return hikes.data;
+        return hikes;
     }
 );
 
@@ -84,5 +120,10 @@ export const gpxAsync = createAsyncThunk(
     }
 );
 
-export const { setHikesPreview, setSelectedHike } = hikeSlice.actions;
+export const {
+    setSelectedHike,
+    setHoveredPreviewHikeId,
+    setHikesPreviewLoading,
+    setSelectedGeoJsonHike,
+} = hikeSlice.actions;
 export default hikeSlice.reducer;

@@ -2,17 +2,22 @@ import { useCallback, useMemo } from "react";
 import { useEffect, useRef } from "react";
 import { AppDispatch, RootState } from "../../state/store";
 import { useDispatch, useSelector } from "react-redux";
-import { hikePreviewAsync } from "../../state/hike/hikeSlice";
+import {
+    hikePreviewAsync,
+    setHikesPreviewLoading,
+} from "../../state/hike/hikeSlice";
 import Map, { Layer, MapRef, Source, ViewStateChangeEvent } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import MapboxMarker from "./MapboxMarker";
 import { setViewState } from "../../state/mapbox/mapboxSlice";
 import { Button } from "@/components/ui/button";
 import { FaChevronRight } from "react-icons/fa6";
-import { toggleSidebar } from "@/state/sidebar/sidebarSlice";
+import { setSidebarState, toggleSidebar } from "@/state/sidebar/sidebarSlice";
+import { useMapRef } from "@/composables/useMapRef";
+import { setSelectedLocationBoundingBox } from "@/state/location/locationSlice";
 
 const Mapbox = () => {
-    const mapRef = useRef<MapRef>(null);
+    const mapRef = useMapRef();
     const mapboxAccessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
     const dispatch = useDispatch<AppDispatch>();
@@ -59,25 +64,41 @@ const Mapbox = () => {
             let selectedBoundingBox = selectedLocation.bbox;
 
             if (selectedLocation.placeType !== "HIKE") {
-                dispatch(hikePreviewAsync(selectedLocation));
+                dispatch(setSidebarState(true));
+                dispatch(setHikesPreviewLoading(true));
 
-                // TODO add dynamic radius after sidebar creation with radius
-                // Recalculate bbox with radius
-                selectedBoundingBox = calculateBbox(
-                    selectedLocation.coordinates,
-                    50
+                // Delay hike preview fetch to prevent flickering
+                setTimeout(
+                    async () =>
+                        await dispatch(
+                            hikePreviewAsync({ location: selectedLocation })
+                        ).then(() => {
+                            // TODO add dynamic radius after sidebar creation with radius
+                            // Recalculate bbox with radius
+                            selectedBoundingBox = calculateBbox(
+                                selectedLocation.coordinates,
+                                50
+                            );
+
+                            redirectToSeletedViewport(
+                                mapRef,
+                                selectedBoundingBox
+                            );
+
+                            dispatch(setHikesPreviewLoading(false));
+                            dispatch(
+                                setSelectedLocationBoundingBox(
+                                    selectedBoundingBox
+                                )
+                            );
+                        }),
+                    200
                 );
+
+                return;
             }
 
-            mapRef.current.fitBounds(
-                [
-                    [selectedBoundingBox[0], selectedBoundingBox[1]],
-                    [selectedBoundingBox[2], selectedBoundingBox[3]],
-                ],
-                {
-                    padding: { top: 10, bottom: 25, left: 15, right: 5 },
-                }
-            );
+            redirectToSeletedViewport(mapRef, selectedBoundingBox);
 
             // TODO find a way to implement this gadget feature properly
             // rotate camera only when hike selected and not when location selected
@@ -96,9 +117,11 @@ const Mapbox = () => {
     }, [dispatch, selectedLocation]);
 
     const markers = useMemo(() => {
-        console.log("USE MEMO MARKERS");
+        if (!hikesPreview) return;
 
-        return hikesPreview.map((hike, i) => {
+        // console.log("USE MEMO MARKERS");
+
+        return hikesPreview?.data.map((hike, i) => {
             return <MapboxMarker key={i} hike={hike} />;
         });
     }, [hikesPreview]);
@@ -143,8 +166,8 @@ const Mapbox = () => {
                 // mapStyle="mapbox://styles/mapbox/streets-v9"
                 mapStyle="mapbox://styles/abdoulaye01/clu26vfli00m301mjgf4z16fy"
                 mapboxAccessToken={mapboxAccessToken}
-                style={{ minWidth: "65vw", maxWidth: "100vw", height: "100vh" }}
-                onMove={onMove}
+                style={{ maxWidth: "100vw", height: "100vh" }}
+                // onMove={onMove}
                 ref={mapRef}
             >
                 {selectedGeoJsonHike && (
@@ -165,6 +188,10 @@ const Mapbox = () => {
                 )}
                 {markers}
             </Map>
+            {/* <div
+                style={{ minWidth: "65vw", maxWidth: "100vw", height: "100vh" }}
+                className="bg-red-600"
+            ></div> */}
         </div>
     );
 };
@@ -188,6 +215,21 @@ function calculateBbox(center: number[], radiusInKm: number) {
     const maxLng = lng + deltaLng * (180 / Math.PI);
 
     return [minLng, minLat, maxLng, maxLat];
+}
+
+function redirectToSeletedViewport(
+    mapRef: React.RefObject<MapRef>,
+    selectedBoundingBox: number[]
+) {
+    return mapRef.current?.fitBounds(
+        [
+            [selectedBoundingBox[0], selectedBoundingBox[1]],
+            [selectedBoundingBox[2], selectedBoundingBox[3]],
+        ],
+        {
+            padding: { top: 10, bottom: 25, left: 15, right: 5 },
+        }
+    );
 }
 
 export default Mapbox;

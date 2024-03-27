@@ -6,13 +6,14 @@ export interface HikeImage {
 export interface HikePreview {
     id: number;
     title: string;
-    excerpt: string;
-    activity_type: string;
-    latitude: number;
-    longitude: number;
     difficulty: string;
     distance: number;
     duration: number;
+    municipality: string;
+    highest_point: number;
+    lowest_point: number;
+    latitude: number;
+    longitude: number;
     images: HikeImage[];
 }
 
@@ -37,4 +38,10 @@ export interface Hike {
     gpx_url: string;
     is_return_starting_point: boolean;
     images: HikeImage[];
+}
+
+export enum HikeDifficulty {
+    EASY = "Facile",
+    MEDIUM = "Moyenne",
+    HARD = "Difficile",
 }

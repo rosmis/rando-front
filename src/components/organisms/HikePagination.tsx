@@ -3,7 +3,7 @@ import {
     PaginationContent,
     PaginationItem,
 } from "@/components/ui/pagination";
-import { hikePreviewAsync } from "@/state/hike/hikeSlice";
+import { hikePreviewsAsync } from "@/state/hike/hikeSlice";
 import { Location } from "@/state/location/locationSlice";
 import { AppDispatch } from "@/state/store";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -41,6 +41,7 @@ const HikePagination = ({
         total &&
         total > 10 && (
             <Pagination className="sticky p-2 bottom-0 bg-white left-0 right-0">
+                <pre>{typeof currentPage}</pre>
                 <PaginationContent>
                     <PaginationItem>
                         <Link
@@ -61,7 +62,7 @@ const HikePagination = ({
                             `}
                             onClick={() =>
                                 dispatch(
-                                    hikePreviewAsync({
+                                    hikePreviewsAsync({
                                         location: selectedLocation!,
                                         page: +currentPage! - 1,
                                     })
@@ -92,7 +93,7 @@ const HikePagination = ({
                                             }`}
                                     onClick={() =>
                                         dispatch(
-                                            hikePreviewAsync({
+                                            hikePreviewsAsync({
                                                 location: selectedLocation!,
                                                 page: i + 1,
                                             })
@@ -116,7 +117,9 @@ const HikePagination = ({
                                 pathname: "/",
                                 search:
                                     searchedParamsWithoutPage +
-                                    `&page=${+currentPage! + 1}`,
+                                    `&page=${
+                                        (currentPage ? +currentPage : 1) + 1
+                                    }`,
                             }}
                             className={`
                                 text-sm rounded-md gap-1 font-medium py-2 px-4 hover:bg-zinc-100 
@@ -129,9 +132,11 @@ const HikePagination = ({
                             `}
                             onClick={() =>
                                 dispatch(
-                                    hikePreviewAsync({
+                                    hikePreviewsAsync({
                                         location: selectedLocation!,
-                                        page: +currentPage! + 1,
+                                        page:
+                                            (currentPage ? +currentPage : 1) +
+                                            1,
                                     })
                                 )
                             }

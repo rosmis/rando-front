@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { AppDispatch, RootState } from "../../state/store";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    hikePreviewAsync,
+    hikePreviewsAsync,
     setHikesPreviewLoading,
 } from "../../state/hike/hikeSlice";
 import Map, { Layer, MapRef, Source, ViewStateChangeEvent } from "react-map-gl";
@@ -71,7 +71,7 @@ const Mapbox = () => {
                 setTimeout(
                     async () =>
                         await dispatch(
-                            hikePreviewAsync({ location: selectedLocation })
+                            hikePreviewsAsync({ location: selectedLocation })
                         ).then(() => {
                             // TODO add dynamic radius after sidebar creation with radius
                             // Recalculate bbox with radius

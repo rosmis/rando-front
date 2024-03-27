@@ -49,7 +49,7 @@ const hikeSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(
-            hikePreviewAsync.fulfilled,
+            hikePreviewsAsync.fulfilled,
             (
                 state,
                 action: PayloadAction<{
@@ -81,7 +81,7 @@ const hikeSlice = createSlice({
     },
 });
 
-export const hikePreviewAsync = createAsyncThunk(
+export const hikePreviewsAsync = createAsyncThunk(
     "hike/fetchHikesPreview",
     async (location: { location: Location; page?: number }) => {
         const hikes = await fetch(

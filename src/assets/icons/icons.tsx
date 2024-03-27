@@ -7,6 +7,7 @@ const icons = {
     mountainHigh: new URL("./mountain-high.svg", import.meta.url).href,
     mountainLow: new URL("./mountain-low.svg", import.meta.url).href,
     arrowUpRightDots: new URL("./arrow-up-right-dots.svg", import.meta.url).href,
+    arrowTurnDownLeft: new URL("./arrow-turn-down-left.svg", import.meta.url).href,
 };
 
 export default icons;

@@ -1,6 +1,8 @@
 import { FaChevronRight } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { styled } from "styled-components";
+import UiIcon from "./UiIcon";
+import icons from "@/assets/icons/icons";
 
 const StyledResult = styled.div`
     width: 350px;
@@ -18,7 +20,12 @@ const StyledResult = styled.div`
     }
 `;
 
-const UiResult = ({ location, handleSelectedLocation, ...props }) => {
+const UiResult = ({
+    location,
+    handleSelectedLocation,
+    isSelected = false,
+    ...props
+}) => {
     const handleSelection = () => {
         handleSelectedLocation(location);
     };
@@ -35,18 +42,21 @@ const UiResult = ({ location, handleSelectedLocation, ...props }) => {
                     pathname: "/",
                     search: params.toString(),
                 }}
-                className="flex items-center justify-start gap-4 px-4 py-2"
+                className={`flex items-center justify-start gap-2 px-4 py-2 ${
+                    isSelected ? "bg-[#e5e7eb]" : ""
+                }`}
                 onClick={handleSelection}
             >
                 <FaChevronRight className="text-[#4b5563] w-fit shrink-0" />
-                <div className="flex flex-col items-start ">
-                    <p className="font-bold text-[#4b5563] max-w-[300px] truncate">
+                <div className="flex flex-col items-start flex-1 max-w-[16.5rem]">
+                    <p className="font-bold text-[#4b5563] max-w-[16.5rem] truncate">
                         {location.name}
                     </p>
-                    <p className="text-sm text-[#4b5563] max-w-[300px] truncate">
+                    <p className="text-sm text-[#4b5563] max-w-[16.5rem] truncate">
                         {location.location}
                     </p>
                 </div>
+                {isSelected && <UiIcon icon={icons.arrowTurnDownLeft} size="small" />}
             </Link>
         </StyledResult>
     );

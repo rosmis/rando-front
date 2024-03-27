@@ -7,7 +7,7 @@ export interface Location {
     placeType: keyof typeof ZoomLevels;
 }
 
-interface ResultLocation {
+export interface ResultLocation {
     name: string;
     location: string;
     centerCoordinates: number[];

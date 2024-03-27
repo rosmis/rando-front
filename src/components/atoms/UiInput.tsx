@@ -1,3 +1,4 @@
+import React from "react";
 import { styled } from "styled-components";
 
 const StyledInput = styled.div`
@@ -14,7 +15,10 @@ const UiInput = ({
     handleInput,
     iconRight = <></>,
     searchTerm = "",
+    handleKeyUp,
 }) => {
+    const inputRef = React.useRef<HTMLInputElement>(null);
+
     const handleInputChange = (e) => {
         handleInput(e.target.value);
     };
@@ -23,16 +27,40 @@ const UiInput = ({
         handleInput("");
     };
 
+    const isMac = window.navigator.userAgent.includes("Mac");
+    const shortcut = isMac ? "⌘K" : "Ctrl+K";
+
+    // Toggle the searchbar when ⌘/ctrk + K is pressed
+    React.useEffect(() => {
+        const down = (e) => {
+            if (e.key === "k" && (e.metaKey || e.ctrlKey) && inputRef.current) {
+                e.preventDefault();
+                inputRef.current.focus();
+            }
+
+            if (e.key === "Escape" && inputRef.current) {
+                inputRef.current.blur();
+
+                return handleKeyUp(e);
+            }
+        };
+
+        document.addEventListener("keydown", down);
+        return () => document.removeEventListener("keydown", down);
+    }, []);
+
     return (
         <>
             <StyledInput className="flex items-center bg-slate-200 gap-4">
                 {icon}
                 <input
+                    ref={inputRef}
                     type="text"
                     placeholder={placeholder}
                     className="outline-none w-full h-5 bg-transparent placeholder-slate-400 leading-4"
                     onChange={handleInputChange}
                     value={searchTerm}
+                    onKeyUpCapture={handleKeyUp}
                 />
 
                 <span
@@ -41,6 +69,12 @@ const UiInput = ({
                 >
                     {iconRight}
                 </span>
+
+                {!searchTerm && (
+                    <span className="items-center hidden md:flex gap-[2px] text-sm font-normal text-[#4b5563]">
+                        {shortcut}
+                    </span>
+                )}
             </StyledInput>
         </>
     );

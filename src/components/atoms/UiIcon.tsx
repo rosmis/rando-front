@@ -1,7 +1,21 @@
-const UiIcon = ({ icon }: { icon: string }) => {
+type IconSize = "small" | "medium" | "large";
+
+const sizeClasses: Record<IconSize, string> = {
+    small: "h-3",
+    medium: "h-5",
+    large: "h-8",
+};
+
+interface UiIconProps {
+    icon: string;
+    size?: IconSize;
+}
+
+const UiIcon = ({ icon, size = "medium" }: UiIconProps) => {
+    const sizeClass = sizeClasses[size];
     return (
         <>
-            <img className="h-5" src={icon} />
+            <img className={`${sizeClass}`} src={icon} />
         </>
     );
 };

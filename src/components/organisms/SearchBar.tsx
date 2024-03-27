@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import SearchInput from "../molecules/SearchInput";
 import debounce from "lodash.debounce";
 import UiResult from "../atoms/UiResult";

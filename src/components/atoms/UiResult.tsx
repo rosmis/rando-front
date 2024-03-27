@@ -56,7 +56,7 @@ const UiResult = ({
                         {location.location}
                     </p>
                 </div>
-                {isSelected && <UiIcon icon={icons.arrowTurnDownLeft} />}
+                {isSelected && <UiIcon icon={icons.arrowTurnDownLeft} size="small" />}
             </Link>
         </StyledResult>
     );
